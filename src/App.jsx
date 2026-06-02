@@ -2294,3 +2294,4 @@ const styles=`
   ::-webkit-scrollbar-thumb{background:#1C2C44;border-radius:2px}
   ::placeholder{color:#4A6285}
 `;
+ 
