@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
 // ─── BRAND ────────────────────────────────────────────────────────────────────
-// ─── BRAND ────────────────────────────────────────────────────────────────────
 const C = {
   primary:"#FF6B1A",     primaryDim:"#FF6B1A14",  primaryBorder:"#FF6B1A40",
   accent:"#4DAAFF",      accentDim:"#4DAAFF12",
@@ -425,7 +424,7 @@ function BookingModal({dj,onClose,onConfirm}) {
 }
 
 // ─── DJ CARD ──────────────────────────────────────────────────────────────────
-function DJCard({dj,onBook,onProfile}) {
+function DJCard({dj,onBook,onProfile,onMessage,user}) {
   const recent=dj.reviews[0];
   return (
     <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,overflow:"hidden",display:"flex",flexDirection:"column",transition:"border-color 0.2s,transform 0.2s"}}
@@ -469,7 +468,7 @@ function DJCard({dj,onBook,onProfile}) {
 }
 
 // ─── BROWSE ───────────────────────────────────────────────────────────────────
-function Browse({djs,onBook,onProfile}) {
+function Browse({djs,onBook,onProfile,onMessage,user}) {
   const [genreF,setGenreF]=useState([]);
   const [eventF,setEventF]=useState("");
   const [maxFee,setMaxFee]=useState(200);
@@ -508,7 +507,7 @@ function Browse({djs,onBook,onProfile}) {
         <Pills options={GENRES} selected={genreF} onChange={setGenreF}/>
       </div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(290px,1fr))",gap:16}}>
-        {filtered.map(dj=><DJCard key={dj.id} dj={dj} onBook={onBook} onProfile={onProfile}/>)}
+        {filtered.map(dj=><DJCard key={dj.id} dj={dj} onBook={onBook} onProfile={onProfile} onMessage={onMessage} user={user}/>)}
         {filtered.length===0&&<div style={{gridColumn:"1/-1",textAlign:"center",padding:60,color:C.sub}}>No DJs match your filters.</div>}
       </div>
     </div>
