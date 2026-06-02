@@ -564,7 +564,23 @@ function DJProfile({dj,user,onBook,onMessage,onReview,onBack,onHelpful,reviewOve
         <div style={{display:"grid",gap:12}}>
           <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:22}}><div style={{fontSize:10,letterSpacing:4,color:C.sub,textTransform:"uppercase",marginBottom:12}}>Bio</div><p style={{fontSize:14,color:"#999",lineHeight:1.8,margin:0}}>{dj.bio}</p></div>
           <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:22}}><div style={{fontSize:10,letterSpacing:4,color:C.sub,textTransform:"uppercase",marginBottom:12}}>Event Types</div><div style={{display:"flex",flexWrap:"wrap",gap:7}}>{dj.events.map(e=><Badge key={e} color={C.blue}>{e}</Badge>)}</div></div>
-          <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:22}}><div style={{fontSize:10,letterSpacing:4,color:C.sub,textTransform:"uppercase",marginBottom:12}}>Available Dates</div><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{dj.available.map(d=><div key={d} style={{background:C.greenDim,border:`1px solid ${C.green}40`,color:C.green,padding:"6px 14px",borderRadius:6,fontSize:12,fontWeight:700}}>{d}</div>)}</div></div>
+          <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:22}}>
+            <div style={{fontSize:10,letterSpacing:4,color:C.sub,textTransform:"uppercase",marginBottom:4}}>Availability Calendar</div>
+            <div style={{fontSize:12,color:C.sub,marginBottom:16}}>Green = available · Click a date to see time slots</div>
+            <AvailabilityCalendar
+              availability={{
+                dates: dj.available,
+                slots: {
+                  [dj.available[0]]: ["7:00 PM","8:00 PM","9:00 PM","10:00 PM"],
+                  [dj.available[1]]: ["6:00 PM","7:00 PM","8:00 PM","9:00 PM","10:00 PM"],
+                  [dj.available[2]]: ["8:00 PM","9:00 PM","10:00 PM"],
+                  [dj.available[3]]: ["7:00 PM","8:00 PM","9:00 PM"],
+                },
+                recurring: ["Friday","Saturday"],
+              }}
+              readOnly={true}
+            />
+          </div>
         </div>
       )}
       {tab==="reviews"&&(
@@ -1980,7 +1996,7 @@ function AvailabilityCalendar({ availability, onToggleDate, onToggleSlot, readOn
       </div>
 
       {/* Time slot editor — shows when a date is selected */}
-      {selected && !readOnly && (
+      {selected && !readOnly && availability?.dates?.includes(selected) && (
         <div style={{marginTop:16,background:"#0a1020",border:`1px solid ${C.border}`,borderRadius:10,padding:16}}>
           <div style={{fontSize:11,letterSpacing:2,color:C.primary,textTransform:"uppercase",marginBottom:12}}>
             Time Slots — {selected}
@@ -2010,7 +2026,7 @@ function AvailabilityCalendar({ availability, onToggleDate, onToggleSlot, readOn
       )}
 
       {/* View-only slot display */}
-      {selected && readOnly && isAvailable(parseInt(selected.split("-")[2])) && (
+      {selected && readOnly && availability?.dates?.includes(selected) && (
         <div style={{marginTop:16,background:"#0a1020",border:`1px solid ${C.border}`,borderRadius:10,padding:16}}>
           <div style={{fontSize:11,letterSpacing:2,color:C.green,textTransform:"uppercase",marginBottom:12}}>
             Available Times — {selected}
