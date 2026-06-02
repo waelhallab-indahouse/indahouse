@@ -1870,43 +1870,318 @@ function UserDashboard({user,bookings,onJoinSession,onReview,onMessage}) {
   );
 }
 
+// ─── AVAILABILITY CALENDAR ────────────────────────────────────────────────────
+
+const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const TIME_SLOTS = ["10:00 AM","11:00 AM","12:00 PM","1:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM","6:00 PM","7:00 PM","8:00 PM","9:00 PM","10:00 PM","11:00 PM"];
+const RECURRING_DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+// Shared calendar view — used by both DJ (edit) and Host (view only)
+function AvailabilityCalendar({ availability, onToggleDate, onToggleSlot, readOnly, bookedDates=[] }) {
+  const today = new Date();
+  const [viewYear,  setViewYear]  = useState(today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(today.getMonth());
+  const [selected,  setSelected]  = useState(null); // selected date for slot editing
+
+  const daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
+  const firstDay    = new Date(viewYear, viewMonth, 1).getDay();
+  const dateStr     = (d) => `${viewYear}-${String(viewMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+
+  const prevMonth = () => { if(viewMonth===0){setViewYear(y=>y-1);setViewMonth(11);}else setViewMonth(m=>m-1); setSelected(null); };
+  const nextMonth = () => { if(viewMonth===11){setViewYear(y=>y+1);setViewMonth(0);}else setViewMonth(m=>m+1); setSelected(null); };
+
+  const isAvailable = (d) => availability?.dates?.includes(dateStr(d));
+  const isBooked    = (d) => bookedDates.includes(dateStr(d));
+  const isPast      = (d) => new Date(dateStr(d)) < new Date(today.toDateString());
+  const getSlots    = (d) => availability?.slots?.[dateStr(d)] || [];
+
+  return (
+    <div>
+      {/* Month nav */}
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
+        <button onClick={prevMonth} style={{background:C.muted,border:"none",color:C.text,width:32,height:32,borderRadius:"50%",cursor:"pointer",fontSize:16}}>‹</button>
+        <div style={{fontFamily:"'Impact','Arial Black',sans-serif",fontSize:16,letterSpacing:1}}>
+          {MONTHS[viewMonth]} {viewYear}
+        </div>
+        <button onClick={nextMonth} style={{background:C.muted,border:"none",color:C.text,width:32,height:32,borderRadius:"50%",cursor:"pointer",fontSize:16}}>›</button>
+      </div>
+
+      {/* Day headers */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:3,marginBottom:3}}>
+        {DAYS.map(d=><div key={d} style={{textAlign:"center",fontSize:10,color:C.sub,letterSpacing:1,padding:"4px 0"}}>{d}</div>)}
+      </div>
+
+      {/* Calendar grid */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:3}}>
+        {/* Empty cells before first day */}
+        {[...Array(firstDay)].map((_,i)=><div key={`e${i}`}/>)}
+
+        {/* Day cells */}
+        {[...Array(daysInMonth)].map((_,i)=>{
+          const d = i+1;
+          const ds = dateStr(d);
+          const avail = isAvailable(d);
+          const booked = isBooked(d);
+          const past = isPast(d);
+          const isSel = selected === ds;
+
+          let bg = C.muted;
+          let color = C.sub;
+          let border = "transparent";
+          if (past) { bg="#0a0f1a"; color=C.sub2; }
+          else if (booked) { bg=`${C.red}22`; color=C.red; border=`${C.red}44`; }
+          else if (avail) { bg:`${C.green}22`; bg=`${C.green}22`; color=C.green; border=`${C.green}55`; }
+          if (isSel) { border=C.primary; }
+
+          return (
+            <div key={d}
+              onClick={()=>{
+                if(past) return;
+                if(!readOnly && onToggleDate) onToggleDate(ds);
+                setSelected(isSel ? null : ds);
+              }}
+              style={{
+                aspectRatio:"1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
+                borderRadius:8,cursor:past?"default":"pointer",
+                background:bg,color,border:`2px solid ${border}`,
+                transition:"all 0.15s",fontSize:13,fontWeight:avail?800:400,
+                boxShadow:isSel?`0 0 0 2px ${C.primary}`:"none",
+                position:"relative",
+              }}
+            >
+              {d}
+              {avail && !past && (
+                <div style={{position:"absolute",bottom:3,left:"50%",transform:"translateX(-50%)",
+                  display:"flex",gap:2}}>
+                  {getSlots(ds).slice(0,3).map((_,si)=>(
+                    <div key={si} style={{width:4,height:4,borderRadius:"50%",background:C.green}}/>
+                  ))}
+                </div>
+              )}
+              {booked && <div style={{position:"absolute",top:2,right:3,fontSize:8,color:C.red}}>●</div>}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Legend */}
+      <div style={{display:"flex",gap:16,marginTop:14,flexWrap:"wrap"}}>
+        {[
+          [C.green,"Available"],
+          [C.red,"Booked"],
+          [C.muted,"Unavailable"],
+        ].map(([col,label])=>(
+          <div key={label} style={{display:"flex",alignItems:"center",gap:6,fontSize:11,color:C.sub}}>
+            <div style={{width:10,height:10,borderRadius:2,background:col,opacity:0.6}}/>
+            {label}
+          </div>
+        ))}
+      </div>
+
+      {/* Time slot editor — shows when a date is selected */}
+      {selected && !readOnly && (
+        <div style={{marginTop:16,background:"#0a1020",border:`1px solid ${C.border}`,borderRadius:10,padding:16}}>
+          <div style={{fontSize:11,letterSpacing:2,color:C.primary,textTransform:"uppercase",marginBottom:12}}>
+            Time Slots — {selected}
+          </div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
+            {TIME_SLOTS.map(slot=>{
+              const active = getSlots(selected).includes(slot);
+              return (
+                <button key={slot} onClick={()=>onToggleSlot&&onToggleSlot(selected,slot)}
+                  style={{
+                    background:active?C.primary:"#111d33",
+                    color:active?"#000":C.sub,
+                    border:`1px solid ${active?C.primary:C.border}`,
+                    padding:"5px 11px",borderRadius:6,cursor:"pointer",
+                    fontSize:11,fontFamily:"inherit",fontWeight:active?800:400,
+                    transition:"all 0.15s",
+                  }}>
+                  {slot}
+                </button>
+              );
+            })}
+          </div>
+          <div style={{fontSize:11,color:C.sub,marginTop:10}}>
+            Click time slots to toggle availability. {getSlots(selected).length} slot{getSlots(selected).length!==1?"s":""} selected.
+          </div>
+        </div>
+      )}
+
+      {/* View-only slot display */}
+      {selected && readOnly && isAvailable(parseInt(selected.split("-")[2])) && (
+        <div style={{marginTop:16,background:"#0a1020",border:`1px solid ${C.border}`,borderRadius:10,padding:16}}>
+          <div style={{fontSize:11,letterSpacing:2,color:C.green,textTransform:"uppercase",marginBottom:12}}>
+            Available Times — {selected}
+          </div>
+          {getSlots(selected).length > 0 ? (
+            <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
+              {getSlots(selected).map(slot=>(
+                <div key={slot} style={{background:`${C.green}18`,color:C.green,border:`1px solid ${C.green}40`,padding:"5px 12px",borderRadius:6,fontSize:12,fontWeight:700}}>
+                  {slot}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{fontSize:12,color:C.sub}}>All day — contact DJ for preferred time</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── DJ DASHBOARD ─────────────────────────────────────────────────────────────
 function DJDashboard({user,djs}) {
   const myDJ=djs.find(d=>d.name===user.djName)||{reviews:[],reviewCount:0,rating:0,ratingBreakdown:{}};
   const totalEarnings=myDJ.reviewCount*((user.fee||100)*2.5);
+
+  // Availability state
+  const [availability, setAvailability] = useState({
+    dates: ["2025-06-14","2025-06-21","2025-06-28","2025-07-05"],
+    slots: {
+      "2025-06-14": ["7:00 PM","8:00 PM","9:00 PM","10:00 PM"],
+      "2025-06-21": ["6:00 PM","7:00 PM","8:00 PM","9:00 PM","10:00 PM"],
+    },
+    recurring: [],
+  });
+  const [activeTab, setActiveTab] = useState("overview");
+  const [recurringDay, setRecurringDay] = useState(null);
+
+  const toggleDate = (dateStr) => {
+    setAvailability(prev => ({
+      ...prev,
+      dates: prev.dates.includes(dateStr)
+        ? prev.dates.filter(d=>d!==dateStr)
+        : [...prev.dates, dateStr].sort(),
+    }));
+  };
+
+  const toggleSlot = (dateStr, slot) => {
+    setAvailability(prev => {
+      const currentSlots = prev.slots[dateStr] || [];
+      const newSlots = currentSlots.includes(slot)
+        ? currentSlots.filter(s=>s!==slot)
+        : [...currentSlots, slot];
+      return { ...prev, slots: { ...prev.slots, [dateStr]: newSlots } };
+    });
+  };
+
+  const toggleRecurring = (day) => {
+    setAvailability(prev => ({
+      ...prev,
+      recurring: prev.recurring.includes(day)
+        ? prev.recurring.filter(d=>d!==day)
+        : [...prev.recurring, day],
+    }));
+  };
+
   return (
-    <div style={{maxWidth:800,margin:"0 auto",padding:"32px 20px"}}>
-      <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:28}}>
+    <div style={{maxWidth:860,margin:"0 auto",padding:"32px 20px"}}>
+      <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:24}}>
         <div style={{width:56,height:56,borderRadius:"50%",background:C.yellow,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}}>🎧</div>
         <div><div style={{fontFamily:"'Impact','Arial Black',sans-serif",fontSize:20}}>{user.djName}</div><div style={{fontSize:12,color:C.sub}}>{user.email} · Remote DJ</div></div>
       </div>
 
-      {/* How DJ side works */}
-      <div style={{background:C.yellowDim,border:`1px solid ${C.yellowBorder}`,borderRadius:10,padding:20,marginBottom:24}}>
-        <div style={{fontFamily:"'Impact','Arial Black',sans-serif",fontSize:14,color:C.yellow,textTransform:"uppercase",letterSpacing:1,marginBottom:10}}>How Remote Sessions Work — Your Side</div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12}}>
-          {[["📅","Get Booked","Hosts find your profile and book a time slot & duration."],["🎙","Go Live","At the agreed time, open Indahouse and start your broadcast from your mixer or mic."],["🎵","Mix Live","Your audio streams privately to the host's session. They hear you live through their speakers."],["💬","See Requests","Song requests come in through the app in real time. Weave them into your set."]].map(([icon,t,d])=>(
-            <div key={t}><div style={{fontSize:20,marginBottom:6}}>{icon}</div><div style={{fontSize:12,fontWeight:800,marginBottom:4}}>{t}</div><div style={{fontSize:11,color:C.sub,lineHeight:1.6}}>{d}</div></div>
-          ))}
-        </div>
+      {/* Tab nav */}
+      <div style={{display:"flex",gap:3,marginBottom:24,borderBottom:`1px solid ${C.border}`,paddingBottom:0}}>
+        {[["overview","📊 Overview"],["calendar","📅 Availability"],["profile","👤 Profile"]].map(([id,label])=>(
+          <button key={id} onClick={()=>setActiveTab(id)} style={{
+            background:"none",border:"none",
+            borderBottom:activeTab===id?`2px solid ${C.primary}`:"2px solid transparent",
+            color:activeTab===id?C.primary:C.sub,
+            padding:"10px 16px",cursor:"pointer",fontSize:12,fontWeight:800,
+            fontFamily:"inherit",textTransform:"uppercase",letterSpacing:1,marginBottom:-1,
+          }}>{label}</button>
+        ))}
       </div>
 
-      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,marginBottom:24}}>
-        {[["Rating",myDJ.rating?`${myDJ.rating} ★`:"New"],["Sessions",myDJ.reviewCount],["Est. Earned",`$${Math.round(totalEarnings)}`]].map(([l,v])=>(
-          <div key={l} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:16,textAlign:"center"}}>
-            <div style={{fontFamily:"'Impact','Arial Black',sans-serif",fontSize:26,color:C.yellow}}>{v}</div>
-            <div style={{fontSize:10,color:C.sub,letterSpacing:2,marginTop:3,textTransform:"uppercase"}}>{l}</div>
+      {/* Overview tab */}
+      {activeTab==="overview" && (
+        <div>
+          <div style={{background:C.yellowDim,border:`1px solid ${C.yellowBorder}`,borderRadius:10,padding:20,marginBottom:20}}>
+            <div style={{fontFamily:"'Impact','Arial Black',sans-serif",fontSize:14,color:C.yellow,textTransform:"uppercase",letterSpacing:1,marginBottom:10}}>How Remote Sessions Work</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12}}>
+              {[["📅","Get Booked","Hosts find your profile and book a time slot."],["🎙","Go Live","Open Indahouse at the agreed time and start broadcasting."],["🎵","Mix Live","Your audio streams privately to the host's speakers."],["💬","See Requests","Song requests come in real time through the app."]].map(([icon,t,d])=>(
+                <div key={t}><div style={{fontSize:20,marginBottom:6}}>{icon}</div><div style={{fontSize:12,fontWeight:800,marginBottom:4}}>{t}</div><div style={{fontSize:11,color:C.sub,lineHeight:1.6}}>{d}</div></div>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
-      <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:22}}>
-        <div style={{fontSize:11,letterSpacing:3,color:C.sub,textTransform:"uppercase",marginBottom:16}}>My Profile</div>
-        {[["Stage Name",user.djName],["City",user.city],["Rate",`$${user.fee}/hr`],["Min Hours",`${user.minHours||1} hour(s)`],["Genres",(user.genres||[]).join(", ")],["Events",(user.events||[]).join(", ")],["Bio",user.bio]].map(([k,v])=>v&&(
-          <div key={k} style={{display:"flex",gap:12,padding:"9px 0",borderBottom:`1px solid ${C.border}`,fontSize:13}}>
-            <span style={{color:C.sub,minWidth:100}}>{k}</span><span style={{color:"#ccc"}}>{v}</span>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,marginBottom:20}}>
+            {[["Rating",myDJ.rating?`${myDJ.rating} ★`:"New"],["Sessions",myDJ.reviewCount],["Est. Earned",`$${Math.round(totalEarnings)}`]].map(([l,v])=>(
+              <div key={l} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:16,textAlign:"center"}}>
+                <div style={{fontFamily:"'Impact','Arial Black',sans-serif",fontSize:26,color:C.yellow}}>{v}</div>
+                <div style={{fontSize:10,color:C.sub,letterSpacing:2,marginTop:3,textTransform:"uppercase"}}>{l}</div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+          <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:18,textAlign:"center"}}>
+            <div style={{fontSize:32,marginBottom:8}}>📅</div>
+            <div style={{fontWeight:800,marginBottom:6}}>{availability.dates.length} available dates set</div>
+            <div style={{fontSize:12,color:C.sub,marginBottom:14}}>Keep your calendar updated so hosts can book you</div>
+            <Btn onClick={()=>setActiveTab("calendar")} sm>Manage Availability →</Btn>
+          </div>
+        </div>
+      )}
+
+      {/* Calendar tab */}
+      {activeTab==="calendar" && (
+        <div>
+          {/* Recurring schedule */}
+          <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:20,marginBottom:16}}>
+            <div style={{fontSize:11,letterSpacing:3,color:C.sub,textTransform:"uppercase",marginBottom:12}}>🔁 Recurring Weekly Availability</div>
+            <div style={{fontSize:12,color:C.sub,marginBottom:12}}>Select days you're generally available every week</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+              {RECURRING_DAYS.map(day=>{
+                const on = availability.recurring.includes(day);
+                return (
+                  <button key={day} onClick={()=>toggleRecurring(day)} style={{
+                    background:on?C.primary:"#111d33",
+                    color:on?"#000":C.sub,
+                    border:`1px solid ${on?C.primary:C.border}`,
+                    padding:"8px 14px",borderRadius:8,cursor:"pointer",
+                    fontSize:12,fontWeight:800,fontFamily:"inherit",transition:"all 0.15s",
+                  }}>{day.slice(0,3)}</button>
+                );
+              })}
+            </div>
+            {availability.recurring.length > 0 && (
+              <div style={{marginTop:10,fontSize:12,color:C.green}}>
+                ✓ Available every {availability.recurring.join(", ")}
+              </div>
+            )}
+          </div>
+
+          {/* Calendar */}
+          <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:20}}>
+            <div style={{fontSize:11,letterSpacing:3,color:C.sub,textTransform:"uppercase",marginBottom:4}}>📅 Specific Date Availability</div>
+            <div style={{fontSize:12,color:C.sub,marginBottom:16}}>Click a date to mark as available, then set time slots</div>
+            <AvailabilityCalendar
+              availability={availability}
+              onToggleDate={toggleDate}
+              onToggleSlot={toggleSlot}
+              readOnly={false}
+            />
+            <div style={{marginTop:16,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <div style={{fontSize:12,color:C.sub}}>{availability.dates.length} dates · {Object.values(availability.slots).flat().length} total slots</div>
+              <Btn sm onClick={()=>alert("Availability saved! ✅ In production this syncs to Supabase.")}>💾 Save Availability</Btn>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Profile tab */}
+      {activeTab==="profile" && (
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:22}}>
+          <div style={{fontSize:11,letterSpacing:3,color:C.sub,textTransform:"uppercase",marginBottom:16}}>My Profile</div>
+          {[["Stage Name",user.djName],["City",user.city],["Rate",`$${user.fee}/hr`],["Min Hours",`${user.minHours||1} hour(s)`],["Genres",(user.genres||[]).join(", ")],["Events",(user.events||[]).join(", ")],["Bio",user.bio]].map(([k,v])=>v&&(
+            <div key={k} style={{display:"flex",gap:12,padding:"9px 0",borderBottom:`1px solid ${C.border}`,fontSize:13}}>
+              <span style={{color:C.sub,minWidth:100}}>{k}</span><span style={{color:"#ccc"}}>{v}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -2169,9 +2444,40 @@ export default function App() {
     setPage(isDJ ? 'dj-dash' : 'browse');
   };
 
+  // Handle Google OAuth redirect — runs on every page load
+  useEffect(()=>{
+    const handleOAuthRedirect = async () => {
+      try {
+        // Check if URL has access_token from OAuth redirect
+        const hash = window.location.hash;
+        if (!hash.includes('access_token')) return;
+
+        const { createClient } = await import('@supabase/supabase-js');
+        const sb = createClient(
+          process.env.REACT_APP_SUPABASE_URL,
+          process.env.REACT_APP_SUPABASE_ANON_KEY
+        );
+
+        // Get the session from the URL hash
+        const { data: { session }, error } = await sb.auth.getSession();
+        if (error) { console.error('Session error:', error); return; }
+
+        if (session?.user) {
+          const u = session.user;
+          const name = u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0] || 'User';
+          setUser({ name, email: u.email, avatar: u.user_metadata?.avatar_url });
+          setRole('user');
+          setPage('browse');
+          // Clean the URL
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      } catch(e) { console.error('OAuth redirect error:', e); }
+    };
+    handleOAuthRedirect();
+  }, []);
+
   const handleGoogleAuth = async () => {
     try {
-      // Real Supabase Google OAuth
       const { createClient } = await import('@supabase/supabase-js');
       const sb = createClient(
         process.env.REACT_APP_SUPABASE_URL,
@@ -2180,10 +2486,10 @@ export default function App() {
       await sb.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin + '/browse',
+          redirectTo: window.location.origin,
+          queryParams: { access_type: 'offline', prompt: 'consent' },
         }
       });
-      // Page will redirect to Google — no need to setUser here
     } catch(e) {
       console.error('Google auth error:', e);
       alert('Google login failed. Please try email login.');
@@ -2199,9 +2505,7 @@ export default function App() {
       );
       await sb.auth.signInWithOAuth({
         provider: 'apple',
-        options: {
-          redirectTo: window.location.origin + '/browse',
-        }
+        options: { redirectTo: window.location.origin }
       });
     } catch(e) {
       console.error('Apple auth error:', e);
@@ -2294,4 +2598,3 @@ const styles=`
   ::-webkit-scrollbar-thumb{background:#1C2C44;border-radius:2px}
   ::placeholder{color:#4A6285}
 `;
- 
