@@ -204,59 +204,7 @@ function Landing({onNav}) {
 }
 
 // ─── AUTH ─────────────────────────────────────────────────────────────────────
-// ─── SOCIAL AUTH BUTTONS ──────────────────────────────────────────────────────
-function SocialAuthButtons({ onGoogle, onApple, label="Continue" }) {
-  return (
-    <div>
-      {/* Divider */}
-      <div style={{display:"flex",alignItems:"center",gap:12,margin:"18px 0"}}>
-        <div style={{flex:1,height:1,background:C.border}}/>
-        <span style={{fontSize:11,color:C.sub,letterSpacing:2,textTransform:"uppercase"}}>or {label} with</span>
-        <div style={{flex:1,height:1,background:C.border}}/>
-      </div>
-      {/* Google */}
-      <button onClick={onGoogle} style={{
-        width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:12,
-        background:"#fff", color:"#1a1a1a", border:"1px solid #ddd",
-        borderRadius:10, padding:"12px 16px", cursor:"pointer",
-        fontSize:13, fontWeight:700, fontFamily:"inherit", marginBottom:10,
-        boxShadow:"0 1px 4px rgba(0,0,0,0.15)", transition:"box-shadow 0.2s",
-      }}
-        onMouseEnter={e=>e.currentTarget.style.boxShadow="0 3px 10px rgba(0,0,0,0.2)"}
-        onMouseLeave={e=>e.currentTarget.style.boxShadow="0 1px 4px rgba(0,0,0,0.15)"}
-      >
-        {/* Google SVG logo */}
-        <svg width="18" height="18" viewBox="0 0 48 48">
-          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-          <path fill="none" d="M0 0h48v48H0z"/>
-        </svg>
-        Continue with Google
-      </button>
-      {/* Apple */}
-      <button onClick={onApple} style={{
-        width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:12,
-        background:"#000", color:"#fff", border:"1px solid #333",
-        borderRadius:10, padding:"12px 16px", cursor:"pointer",
-        fontSize:13, fontWeight:700, fontFamily:"inherit",
-        boxShadow:"0 1px 4px rgba(0,0,0,0.3)", transition:"box-shadow 0.2s",
-      }}
-        onMouseEnter={e=>e.currentTarget.style.boxShadow="0 3px 10px rgba(0,0,0,0.5)"}
-        onMouseLeave={e=>e.currentTarget.style.boxShadow="0 1px 4px rgba(0,0,0,0.3)"}
-      >
-        {/* Apple SVG logo */}
-        <svg width="16" height="18" viewBox="0 0 814 1000" fill="#fff">
-          <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 651.9 0 541.7 0 436.7c0-157.4 102.6-240.8 203.3-240.8 60.7 0 111.3 39.8 147.1 39.8 33.5 0 90.2-42.2 159.1-42.2 60.5 0 127.3 22.2 171.7 81.1zm-186.7-84.1c-28.9-36.8-79.2-64.9-124.9-64.9-6.2 0-12.5.5-18.6 1.5 1.7-53.8 32.1-112.6 68.9-148.5 44-42.5 108.1-69.5 163.5-69.5 4.7 0 9.5.3 14.2.8-2.1 56.1-30.4 113.1-68 151.4-32.7 33.6-83.7 61.6-135.1 129.2z"/>
-        </svg>
-        Continue with Apple
-      </button>
-    </div>
-  );
-}
-
-function AuthForm({title,subtitle,fields,onSubmit,switchLabel,onSwitch,cta,onGoogle,onApple}) {
+function AuthForm({title,subtitle,fields,onSubmit,switchLabel,onSwitch,cta}) {
   const [vals,setVals]=useState({});
   return (
     <div style={{maxWidth:480,margin:"52px auto",padding:"0 20px"}}>
@@ -265,8 +213,6 @@ function AuthForm({title,subtitle,fields,onSubmit,switchLabel,onSwitch,cta,onGoo
         <div style={{color:C.sub,fontSize:13}}>{subtitle}</div>
       </div>
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:14,padding:28}}>
-        {/* Social auth at the top */}
-        <SocialAuthButtons onGoogle={onGoogle} onApple={onApple} label="sign up"/>
         {fields.map(f=>
           f.type==="genres"?<div key={f.key} style={{marginBottom:14}}><label style={{fontSize:10,letterSpacing:3,color:C.sub,textTransform:"uppercase"}}>Music Genres *</label><Pills options={GENRES} selected={vals[f.key]||[]} onChange={v=>setVals(p=>({...p,[f.key]:v}))}/></div>
           :f.type==="events"?<div key={f.key} style={{marginBottom:14}}><label style={{fontSize:10,letterSpacing:3,color:C.sub,textTransform:"uppercase"}}>Event Types</label><Pills options={EVENT_TYPES} selected={vals[f.key]||[]} onChange={v=>setVals(p=>({...p,[f.key]:v}))}/></div>
@@ -278,7 +224,6 @@ function AuthForm({title,subtitle,fields,onSubmit,switchLabel,onSwitch,cta,onGoo
     </div>
   );
 }
-
 
 // ─── REVIEW CARD ──────────────────────────────────────────────────────────────
 function ReviewCard({review,onHelpful}) {
@@ -1907,57 +1852,6 @@ function DJDashboard({user,djs}) {
   );
 }
 
-// ─── LOGIN FORM ───────────────────────────────────────────────────────────────
-function LoginForm({ onSubmit, onSignUp, onDJSignUp, onGoogle, onApple }) {
-  const [email,    setEmail]    = useState("");
-  const [password, setPassword] = useState("");
-  const [role,     setRole]     = useState("user");
-  const [error,    setError]    = useState("");
-
-  const handleSubmit = () => {
-    if (!email || !password) { setError("Please fill in all fields."); return; }
-    setError("");
-    onSubmit({ email, password, role });
-  };
-
-  return (
-    <div>
-      {/* Social login at top */}
-      <SocialAuthButtons onGoogle={onGoogle} onApple={onApple} label="log in"/>
-
-      <Input label="Email" type="email" placeholder="you@email.com" required value={email} onChange={setEmail}/>
-      <Input label="Password" type="password" placeholder="••••••••" required value={password} onChange={setPassword}/>
-
-      {/* Role toggle */}
-      <div style={{marginBottom:18}}>
-        <div style={{fontSize:10,letterSpacing:3,color:C.sub,textTransform:"uppercase",marginBottom:8}}>I am a</div>
-        <div style={{display:"flex",gap:8}}>
-          {[["user","🎉 Party Host"],["dj","🎧 DJ"]].map(([r,label])=>(
-            <button key={r} onClick={()=>setRole(r)} style={{
-              flex:1, background:role===r?C.primary:"#0a1020",
-              color:role===r?"#000":C.sub,
-              border:`1px solid ${role===r?C.primary:C.border}`,
-              padding:"10px", borderRadius:8, cursor:"pointer",
-              fontSize:12, fontWeight:800, fontFamily:"inherit",
-            }}>{label}</button>
-          ))}
-        </div>
-      </div>
-
-      {error && <div style={{color:C.red,fontSize:12,marginBottom:12}}>{error}</div>}
-
-      <Btn onClick={handleSubmit} full sx={{marginBottom:14}}>Log In →</Btn>
-
-      <div style={{textAlign:"center",fontSize:13,color:C.sub}}>
-        Don't have an account?{" "}
-        <span onClick={onSignUp} style={{color:C.primary,cursor:"pointer",fontWeight:700}}>Sign up as host</span>
-        {" "}or{" "}
-        <span onClick={onDJSignUp} style={{color:C.primary,cursor:"pointer",fontWeight:700}}>join as DJ</span>
-      </div>
-    </div>
-  );
-}
-
 // ─── APP ROOT ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [page,setPage]=useState("landing");
@@ -1988,38 +1882,10 @@ export default function App() {
     setDjs(prev=>prev.map(dj=>{if(dj.id!==djId) return dj;const all=[review,...dj.reviews];const avg=all.reduce((s,r)=>s+r.rating,0)/all.length;const nb={...dj.ratingBreakdown};nb[review.rating]=(nb[review.rating]||0)+1;return {...dj,rating:Math.round(avg*10)/10,reviewCount:dj.reviewCount+1,ratingBreakdown:nb};}));
   };
   const handleHelpful=(djId,reviewId)=>setReviewOverrides(prev=>({...prev,[djId]:(prev[djId]||[]).map(r=>r.id===reviewId?{...r,helpful:r.helpful+1}:r)}));
-  const handleLogin = (vals) => {
-    if (!vals.email || !vals.password) return;
-    const isDJ = vals.role === 'dj';
-    setUser({ name: vals.email.split('@')[0], email: vals.email, djName: vals.email.split('@')[0] });
-    setRole(isDJ ? 'dj' : 'user');
-    setPage(isDJ ? 'dj-dash' : 'browse');
-  };
-
-  const handleGoogleAuth = () => {
-    // In production: supabase.auth.signInWithOAuth({ provider: 'google' })
-    // For demo — simulate Google login
-    const mockName = "Google User";
-    const mockEmail = "user@gmail.com";
-    setUser({ name: mockName, email: mockEmail });
-    setRole('user');
-    setPage('browse');
-  };
-
-  const handleAppleAuth = () => {
-    // In production: supabase.auth.signInWithOAuth({ provider: 'apple' })
-    // For demo — simulate Apple login
-    const mockName = "Apple User";
-    const mockEmail = "user@icloud.com";
-    setUser({ name: mockName, email: mockEmail });
-    setRole('user');
-    setPage('browse');
-  };
-
   const currentPage=activeSession?"session":profileDJ?"profile":page;
   const navItems=user
     ?role==="dj"?[["dj-dash","Dashboard"],["browse","Browse"]]:[["browse","Browse DJs"],["user-dash","My Sessions"]]
-    :[["browse","Browse DJs"],["login","Log In"],["signup-user","Sign Up"],["signup-dj","DJ Sign Up"]];
+    :[["browse","Browse DJs"],["signup-user","Sign Up"],["signup-dj","DJ Sign Up"]];
 
   if(currentPage==="session") return (
     <div style={{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"'Helvetica Neue',Helvetica,Arial,sans-serif"}}>
@@ -2044,36 +1910,15 @@ export default function App() {
         <div style={{maxWidth:1100,margin:"0 auto",padding:"0 16px",display:"flex",justifyContent:"space-between",alignItems:"center",height:52}}>
           <div onClick={()=>nav("landing")} style={{cursor:"pointer"}}><Logo sm/></div>
           <div style={{display:"flex",gap:4,alignItems:"center",flexWrap:"wrap"}}>
-            {navItems.map(([p,label])=>(
-              <button key={p} onClick={()=>nav(p)} style={{
-                background:p==="signup-user"&&!user?C.primary:page===p?C.yellowDim:"transparent",
-                color:p==="signup-user"&&!user?"#000":page===p?C.yellow:C.sub,
-                border:`1px solid ${p==="signup-user"&&!user?C.primary:page===p?C.yellowBorder:"transparent"}`,
-                padding:"5px 12px",borderRadius:6,cursor:"pointer",fontSize:11,
-                fontWeight:800,fontFamily:"inherit",textTransform:"uppercase",letterSpacing:1
-              }}>{label}</button>
-            ))}
-            {user&&<button onClick={()=>{setUser(null);setRole(null);nav("landing");}} style={{background:"transparent",color:C.sub,border:`1px solid ${C.border}`,padding:"5px 11px",borderRadius:6,cursor:"pointer",fontSize:11,fontFamily:"inherit",textTransform:"uppercase",letterSpacing:1}}>Log Out</button>}
+            {navItems.map(([p,label])=><button key={p} onClick={()=>nav(p)} style={{background:page===p?C.yellowDim:"transparent",color:page===p?C.yellow:C.sub,border:`1px solid ${page===p?C.yellowBorder:"transparent"}`,padding:"5px 12px",borderRadius:6,cursor:"pointer",fontSize:11,fontWeight:800,fontFamily:"inherit",textTransform:"uppercase",letterSpacing:1}}>{label}</button>)}
+            {user&&<button onClick={()=>{setUser(null);setRole(null);nav("landing");}} style={{background:"transparent",color:C.sub,border:`1px solid ${C.border}`,padding:"5px 11px",borderRadius:6,cursor:"pointer",fontSize:11,fontFamily:"inherit",textTransform:"uppercase",letterSpacing:1}}>Out</button>}
           </div>
         </div>
       </nav>
       <div style={{animation:"fadeIn 0.3s ease"}} key={currentPage}>
         {currentPage==="landing"&&<Landing onNav={nav}/>}
-
-        {currentPage==="login"&&(
-          <div style={{maxWidth:440,margin:"52px auto",padding:"0 20px"}}>
-            <div style={{textAlign:"center",marginBottom:28}}>
-              <div style={{fontFamily:"'Impact','Arial Black',sans-serif",fontSize:26,color:C.primary,textTransform:"uppercase",letterSpacing:-0.5,marginBottom:6}}>Welcome Back</div>
-              <div style={{color:C.sub,fontSize:13}}>Log in to your Indahouse account</div>
-            </div>
-            <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:14,padding:28}}>
-              <LoginForm onSubmit={handleLogin} onGoogle={handleGoogleAuth} onApple={handleAppleAuth} onSignUp={()=>nav("signup-user")} onDJSignUp={()=>nav("signup-dj")}/>
-            </div>
-          </div>
-        )}
-
-        {currentPage==="signup-user"&&<AuthForm title="Create Account" subtitle="Book remote DJs for your next party or dinner" cta="Create Account →" fields={[{key:"name",label:"Full Name",placeholder:"Your name",required:true},{key:"email",label:"Email",type:"email",placeholder:"you@email.com",required:true},{key:"password",label:"Password",type:"password",placeholder:"••••••••",required:true},{key:"city",label:"Your City",placeholder:"e.g. Miami"}]} onSubmit={handleUserSignup} onGoogle={handleGoogleAuth} onApple={handleAppleAuth} switchLabel="Already have an account?" onSwitch={()=>nav("login")}/>}
-        {currentPage==="signup-dj"&&<AuthForm title="DJ Sign Up" subtitle="Get booked for private remote sessions worldwide" cta="Create DJ Profile →" fields={[{key:"djName",label:"Stage Name",placeholder:"DJ ___",required:true},{key:"email",label:"Email",type:"email",placeholder:"you@email.com",required:true},{key:"password",label:"Password",type:"password",placeholder:"••••••••",required:true},{key:"city",label:"City",placeholder:"e.g. New York",required:true},{key:"fee",label:"Hourly Rate ($)",type:"number",placeholder:"e.g. 100",required:true,note:"What you charge per hour of remote mixing"},{key:"minHours",label:"Minimum Session (hours)",type:"number",placeholder:"e.g. 2"},{key:"genres",label:"Music Genres",type:"genres"},{key:"events",label:"Event Types",type:"events"},{key:"bio",label:"Your Bio",type:"textarea",placeholder:"Tell hosts what makes your remote sets special…"}]} onSubmit={handleDJSignup} switchLabel="Already have an account?" onSwitch={()=>nav("login")}/>}
+        {currentPage==="signup-user"&&<AuthForm title="Create Account" subtitle="Book remote DJs for your next party or dinner" cta="Create Account →" fields={[{key:"name",label:"Full Name",placeholder:"Your name",required:true},{key:"email",label:"Email",type:"email",placeholder:"you@email.com",required:true},{key:"password",label:"Password",type:"password",placeholder:"••••••••",required:true},{key:"city",label:"Your City",placeholder:"e.g. Miami"}]} onSubmit={handleUserSignup} switchLabel="Are you a DJ?" onSwitch={()=>nav("signup-dj")}/>}
+        {currentPage==="signup-dj"&&<AuthForm title="DJ Sign Up" subtitle="Get booked for private remote sessions worldwide" cta="Create DJ Profile →" fields={[{key:"djName",label:"Stage Name",placeholder:"DJ ___",required:true},{key:"email",label:"Email",type:"email",placeholder:"you@email.com",required:true},{key:"password",label:"Password",type:"password",placeholder:"••••••••",required:true},{key:"city",label:"City",placeholder:"e.g. New York",required:true},{key:"fee",label:"Hourly Rate ($)",type:"number",placeholder:"e.g. 100",required:true,note:"What you charge per hour of remote mixing"},{key:"minHours",label:"Minimum Session (hours)",type:"number",placeholder:"e.g. 2"},{key:"genres",label:"Music Genres",type:"genres"},{key:"events",label:"Event Types",type:"events"},{key:"bio",label:"Your Bio",type:"textarea",placeholder:"Tell hosts what makes your remote sets special…"}]} onSubmit={handleDJSignup} switchLabel="Looking to book?" onSwitch={()=>nav("signup-user")}/>}
         {currentPage==="browse"&&<Browse djs={djs} onBook={handleBook} onProfile={dj=>setProfileDJ(dj)}/>}
         {currentPage==="profile"&&profileDJ&&<DJProfile dj={profileDJ} user={user} onBook={handleBook} onReview={(dj)=>setReviewTarget({dj,booking:null})} onBack={()=>setProfileDJ(null)} onHelpful={handleHelpful} reviewOverrides={reviewOverrides}/>}
         {currentPage==="user-dash"&&user&&<UserDashboard user={user} bookings={bookings} onJoinSession={b=>setActiveSession(b)} onReview={(dj,b)=>setReviewTarget({dj,booking:b})}/>}
