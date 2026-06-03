@@ -3083,7 +3083,7 @@ export default function App() {
   if(currentPage==="session") return (
     <div style={{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"'Helvetica Neue',Helvetica,Arial,sans-serif"}}>
       <style>{styles}</style>
-      <nav style={{position:"sticky",top:0,zIndex:100,background:"#070D1Cf0",backdropFilter:"blur(12px)",borderBottom:`1px solid ${C.border}`}}>
+      <nav style={{position:"sticky",top:0,zIndex:100,background:"#070D1Cf0",backdropFilter:"blur(12px)",borderBottom:`1px solid ${C.border}`,paddingTop:"env(safe-area-inset-top)"}}>
         <div style={{maxWidth:1100,margin:"0 auto",padding:"0 16px",display:"flex",justifyContent:"space-between",alignItems:"center",height:52}}>
           <Logo sm/>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -3099,7 +3099,7 @@ export default function App() {
   return (
     <div style={{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"'Helvetica Neue',Helvetica,Arial,sans-serif"}}>
       <style>{styles}</style>
-      <nav style={{position:"sticky",top:0,zIndex:100,background:"#070D1Cf0",backdropFilter:"blur(12px)",borderBottom:`1px solid ${C.border}`}}>
+      <nav style={{position:"sticky",top:0,zIndex:100,background:"#070D1Cf0",backdropFilter:"blur(12px)",borderBottom:`1px solid ${C.border}`,paddingTop:"env(safe-area-inset-top)"}}>
         <div style={{maxWidth:1100,margin:"0 auto",padding:"0 16px",display:"flex",justifyContent:"space-between",alignItems:"center",height:52}}>
           <div onClick={()=>nav("landing")} style={{cursor:"pointer"}}><Logo sm/></div>
           <div style={{display:"flex",gap:4,alignItems:"center",flexWrap:"wrap"}}>
