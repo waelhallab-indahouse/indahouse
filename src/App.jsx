@@ -2914,7 +2914,7 @@ function PWAInstallPrompt() {
         </div>
         <div style={{fontSize:12, color:C.sub, lineHeight:1.5}}>
           {isIOS
-            ? "Tap the Share button below, then "Add to Home Screen" for the best experience"
+            ? "Tap the Share button below, then 'Add to Home Screen' for the best experience"
             : "Install Indahouse as an app for quick access and offline support"}
         </div>
       </div>
