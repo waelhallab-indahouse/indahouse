@@ -401,8 +401,34 @@ function BookingModal({dj,onClose,onConfirm}) {
         </div>
       </div>
 
-      <Input label="Event Date" type="select" value={date} onChange={setDate} required options={dj.available}/>
-      <Input label="Session Start Time" type="time" value={startTime} onChange={setStartTime} required note="The DJ goes live at this exact time"/>
+      {/* Date picker — calendar view */}
+      <div style={{marginBottom:14}}>
+        <label style={{fontSize:10,letterSpacing:3,color:C.sub,textTransform:"uppercase"}}>Event Date & Time <span style={{color:C.yellow}}>*</span></label>
+        <div style={{background:"#0A1322",border:`1px solid ${C.border}`,borderRadius:8,padding:14,marginTop:6}}>
+          <AvailabilityCalendar
+            availability={{
+              dates: dj.available,
+              slots: {
+                [dj.available[0]]: ["7:00 PM","8:00 PM","9:00 PM","10:00 PM"],
+                [dj.available[1]]: ["6:00 PM","7:00 PM","8:00 PM","9:00 PM","10:00 PM"],
+                [dj.available[2]]: ["8:00 PM","9:00 PM","10:00 PM"],
+                [dj.available[3]]: ["7:00 PM","8:00 PM","9:00 PM"],
+              },
+              recurring: [],
+            }}
+            readOnly={true}
+            onSelectSlot={(d, slot) => { setDate(d); setStartTime(slot); }}
+          />
+          {date && startTime && (
+            <div style={{marginTop:10,background:`${C.green}15`,border:`1px solid ${C.green}40`,borderRadius:6,padding:"8px 12px",fontSize:12,color:C.green,fontWeight:700}}>
+              ✓ Selected: {date} at {startTime}
+            </div>
+          )}
+          {(!date || !startTime) && (
+            <div style={{marginTop:10,fontSize:11,color:C.sub}}>Click a green date, then select a time slot below it</div>
+          )}
+        </div>
+      </div>
       <Input label="Duration" type="select" value={duration} onChange={setDuration} required options={DURATIONS} note={`Min ${dj.minHours} hour${dj.minHours>1?"s":""}`}/>
       <Input label="Event Type" type="select" value={eventType} onChange={setEventType} required options={EVENT_TYPES}/>
       <Input label="Notes for DJ (optional)" type="textarea" value={note} onChange={setNote} placeholder="Vibe, genres to focus on, song requests to start with, anything else…"/>
@@ -1894,7 +1920,7 @@ const TIME_SLOTS = ["10:00 AM","11:00 AM","12:00 PM","1:00 PM","2:00 PM","3:00 P
 const RECURRING_DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
 // Shared calendar view — used by both DJ (edit) and Host (view only)
-function AvailabilityCalendar({ availability, onToggleDate, onToggleSlot, readOnly, bookedDates=[] }) {
+function AvailabilityCalendar({ availability, onToggleDate, onToggleSlot, onSelectSlot, readOnly, bookedDates=[] }) {
   const today = new Date();
   const [viewYear,  setViewYear]  = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
@@ -1954,8 +1980,11 @@ function AvailabilityCalendar({ availability, onToggleDate, onToggleSlot, readOn
             <div key={d}
               onClick={()=>{
                 if(past) return;
-                if(!readOnly && onToggleDate) onToggleDate(ds);
                 setSelected(isSel ? null : ds);
+              }}
+              onDoubleClick={()=>{
+                if(past || readOnly) return;
+                if(onToggleDate) onToggleDate(ds);
               }}
               style={{
                 aspectRatio:"1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
@@ -1998,8 +2027,19 @@ function AvailabilityCalendar({ availability, onToggleDate, onToggleSlot, readOn
       {/* Time slot editor — shows when a date is selected */}
       {selected && !readOnly && availability?.dates?.includes(selected) && (
         <div style={{marginTop:16,background:"#0a1020",border:`1px solid ${C.border}`,borderRadius:10,padding:16}}>
-          <div style={{fontSize:11,letterSpacing:2,color:C.primary,textTransform:"uppercase",marginBottom:12}}>
-            Time Slots — {selected}
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+            <div style={{fontSize:11,letterSpacing:2,color:C.primary,textTransform:"uppercase"}}>
+              Time Slots — {selected}
+            </div>
+            <button onClick={()=>onToggleDate&&onToggleDate(selected)} style={{
+              background:availability?.dates?.includes(selected)?`${C.red}22`:`${C.green}22`,
+              color:availability?.dates?.includes(selected)?C.red:C.green,
+              border:`1px solid ${availability?.dates?.includes(selected)?C.red:C.green}44`,
+              padding:"4px 12px",borderRadius:6,cursor:"pointer",fontSize:11,
+              fontFamily:"inherit",fontWeight:700,
+            }}>
+              {availability?.dates?.includes(selected)?"✕ Remove Date":"✓ Mark Available"}
+            </button>
           </div>
           <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
             {TIME_SLOTS.map(slot=>{
@@ -2033,14 +2073,26 @@ function AvailabilityCalendar({ availability, onToggleDate, onToggleSlot, readOn
           </div>
           {getSlots(selected).length > 0 ? (
             <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
-              {getSlots(selected).map(slot=>(
-                <div key={slot} style={{background:`${C.green}18`,color:C.green,border:`1px solid ${C.green}40`,padding:"5px 12px",borderRadius:6,fontSize:12,fontWeight:700}}>
-                  {slot}
-                </div>
-              ))}
+              {getSlots(selected).map(slot=>{
+                const isChosen = onSelectSlot && availability?._selected === slot;
+                return (
+                  <button key={slot}
+                    onClick={()=>onSelectSlot&&onSelectSlot(selected,slot)}
+                    style={{
+                      background:isChosen?C.green:`${C.green}18`,
+                      color:isChosen?"#000":C.green,
+                      border:`1px solid ${C.green}40`,
+                      padding:"7px 14px",borderRadius:6,fontSize:12,fontWeight:700,
+                      cursor:onSelectSlot?"pointer":"default",
+                      fontFamily:"inherit",transition:"all 0.15s",
+                    }}>
+                    {slot}
+                  </button>
+                );
+              })}
             </div>
           ) : (
-            <div style={{fontSize:12,color:C.sub}}>All day — contact DJ for preferred time</div>
+            <div style={{fontSize:12,color:C.sub}}>All day available — contact DJ for preferred time</div>
           )}
         </div>
       )}
@@ -2172,7 +2224,7 @@ function DJDashboard({user,djs}) {
           {/* Calendar */}
           <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:20}}>
             <div style={{fontSize:11,letterSpacing:3,color:C.sub,textTransform:"uppercase",marginBottom:4}}>📅 Specific Date Availability</div>
-            <div style={{fontSize:12,color:C.sub,marginBottom:16}}>Click a date to mark as available, then set time slots</div>
+            <div style={{fontSize:12,color:C.sub,marginBottom:16}}>Click a date to select it → add time slots below · Use the button to mark/unmark availability</div>
             <AvailabilityCalendar
               availability={availability}
               onToggleDate={toggleDate}
