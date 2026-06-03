@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Indahouse — Offline</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      background:#070D1C;color:#EDF2FB;
+      font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
+      min-height:100vh;display:flex;align-items:center;justify-content:center;
+      padding:24px;text-align:center;
+    }
+    .card{max-width:400px;width:100%}
+    .logo{font-size:64px;margin-bottom:16px;animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+    h1{
+      font-family:Impact,'Arial Black',sans-serif;
+      font-size:32px;color:#FF6B1A;
+      text-transform:uppercase;letter-spacing:-1px;margin-bottom:8px;
+    }
+    .sub{font-size:14px;color:#4A6285;line-height:1.8;margin-bottom:32px}
+    .tips{
+      background:#0C1528;border:1px solid #182740;border-radius:14px;
+      padding:20px;margin-bottom:24px;text-align:left;
+    }
+    .tips h3{font-size:12px;letter-spacing:3px;color:#FF6B1A;text-transform:uppercase;margin-bottom:14px}
+    .tip{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;font-size:13px;color:#8DA4BF;line-height:1.6}
+    .tip:last-child{margin-bottom:0}
+    .tip-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+    .btn{
+      display:block;width:100%;
+      background:#FF6B1A;color:#000;
+      border:none;border-radius:10px;
+      padding:14px;font-size:14px;font-weight:800;
+      font-family:inherit;cursor:pointer;
+      text-transform:uppercase;letter-spacing:1px;
+      text-decoration:none;
+    }
+    .wave{
+      position:fixed;bottom:0;left:0;right:0;
+      display:flex;gap:3px;align-items:flex-end;padding:0 4px;height:60px;
+      pointer-events:none;opacity:0.3;
+    }
+    .bar{
+      flex:1;background:#FF6B1A;border-radius:2px 2px 0 0;
+      animation:wave var(--d) ease-in-out infinite alternate;
+    }
+    @keyframes wave{from{height:8px}to{height:var(--h)}}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">🎧</div>
+    <h1>No Signal</h1>
+    <p class="sub">
+      The DJ is still in da house — but your internet isn't.<br/>
+      Check your connection and try again.
+    </p>
+    <div class="tips">
+      <h3>While you wait</h3>
+      <div class="tip"><span class="tip-icon">📶</span><span>Check your WiFi or mobile data connection</span></div>
+      <div class="tip"><span class="tip-icon">🔄</span><span>Try switching between WiFi and mobile data</span></div>
+      <div class="tip"><span class="tip-icon">✈️</span><span>Turn Airplane mode on and off to reset</span></div>
+      <div class="tip"><span class="tip-icon">🎵</span><span>Your booked sessions will be ready when you're back online</span></div>
+    </div>
+    <button class="btn" onclick="window.location.reload()">Try Again →</button>
+  </div>
+
+  <!-- Animated sound wave at bottom -->
+  <div class="wave" id="wave"></div>
+
+  <script>
+    const wave = document.getElementById('wave');
+    for(let i=0;i<52;i++){
+      const bar = document.createElement('div');
+      bar.className='bar';
+      const h = Math.random()*40+8;
+      const d = (Math.random()*0.8+0.4).toFixed(2);
+      bar.style.cssText=`--h:${h}px;--d:${d}s;animation-delay:${(Math.random()*0.5).toFixed(2)}s`;
+      wave.appendChild(bar);
+    }
+    // Auto-retry every 10 seconds
+    setInterval(()=>{
+      fetch('/').then(()=>window.location.reload()).catch(()=>{});
+    }, 10000);
+  </script>
+</body>
+</html>
