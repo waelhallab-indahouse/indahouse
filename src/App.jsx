@@ -21,12 +21,12 @@ const genId = () => Math.random().toString(36).slice(2,9);
 
 // ─── SEED DJS ─────────────────────────────────────────────────────────────────
 const SEED_DJS = [
-  {id:1,name:"DJ Solaris",avatar:"☀️",city:"Miami",genres:["House","Techno","EDM"],fee:120,feeUnit:"hr",rating:4.9,reviewCount:87,bio:"10 years on the decks. Resident at Club Space Miami. I'll turn your living room into a deep house journey — all from my studio.",events:["House Party","Rooftop","Corporate"],available:["2025-06-14","2025-06-21","2025-06-28","2025-07-05"],minHours:1,reviews:[{id:"rv1",author:"Marcus T.",avatar:"M",rating:5,date:"2025-05-10",eventType:"House Party",duration:"3 hours",text:"Booked Solaris for my birthday. Streamed flawlessly through my Sonos. Guests had no idea the DJ wasn't in the room — until I told them. Incredible.",helpful:18},{id:"rv2",author:"Sofia R.",avatar:"S",rating:5,date:"2025-04-22",eventType:"Rooftop",text:"Remote set for our rooftop. He took song requests through the app, read the vibe perfectly. Zero technical issues.",helpful:11}],ratingBreakdown:{5:79,4:6,3:2,2:0,1:0}},
-  {id:2,name:"La Reina",avatar:"👑",city:"Los Angeles",genres:["Latin","Reggaeton","Afrobeats"],fee:95,feeUnit:"hr",rating:4.8,reviewCount:64,bio:"Bringing sabor to your speakers. I specialize in remote dinner sets and celebration vibes — Latin heat piped straight to your party.",events:["Dinner Party","Birthday","Wedding"],available:["2025-06-15","2025-06-22","2025-07-06"],minHours:2,reviews:[{id:"rv3",author:"Elena V.",avatar:"E",rating:5,date:"2025-05-18",eventType:"Wedding",duration:"4 hours",text:"Hired La Reina remotely for our backyard wedding. My phone into a Bluetooth speaker and the whole reception danced all night. Best decision.",helpful:24},{id:"rv4",author:"Carlos M.",avatar:"C",rating:5,date:"2025-04-01",eventType:"Birthday",duration:"2 hours",text:"She warmed up slow with bachata then went full reggaeton. Crowd was wild. Remote DJ concept works SO well.",helpful:13}],ratingBreakdown:{5:57,4:5,3:2,2:0,1:0}},
-  {id:3,name:"Midnight Mack",avatar:"🎩",city:"New York",genres:["Hip-Hop","R&B","Funk"],fee:150,feeUnit:"hr",rating:5.0,reviewCount:112,bio:"Former tour DJ. Now I bring that arena energy straight to your house party — remotely. Plug me into your speakers and step back.",events:["House Party","Birthday","Bar Mitzvah"],available:["2025-06-13","2025-06-20","2025-06-27","2025-07-04"],minHours:2,reviews:[{id:"rv5",author:"Tasha W.",avatar:"T",rating:5,date:"2025-05-20",eventType:"Birthday",duration:"3 hours",text:"We streamed Mack through an airport Bluetooth speaker at a house party. 40 people. Nobody sat down for 3 hours. I'm still getting texts about it.",helpful:39},{id:"rv6",author:"Devon A.",avatar:"D",rating:5,date:"2025-05-01",eventType:"House Party",duration:"2 hours",text:"Remote DJ that actually felt personal. He sent a message before asking about the vibe. Mid-set he dropped a birthday shoutout. A+.",helpful:21}],ratingBreakdown:{5:112,4:0,3:0,2:0,1:0}},
-  {id:4,name:"Vesper Vox",avatar:"🌙",city:"Chicago",genres:["Jazz","Disco","Funk","House"],fee:85,feeUnit:"hr",rating:4.7,reviewCount:43,bio:"For dinners that deserve a soundtrack. I craft elegant sets — jazz to disco to deep house — piped privately to your table.",events:["Dinner Party","Anniversary","Corporate"],available:["2025-06-14","2025-06-21","2025-07-12"],minHours:1,reviews:[{id:"rv7",author:"Olivia B.",avatar:"O",rating:5,date:"2025-05-05",eventType:"Dinner Party",duration:"2 hours",text:"Vesper streamed live to our dinner party. Guests kept asking who curated the playlist. When I said it was a live remote DJ they were floored.",helpful:10}],ratingBreakdown:{5:35,4:6,3:2,2:0,1:0}},
-  {id:5,name:"Flux",avatar:"⚡",city:"Berlin",genres:["Techno","EDM","House"],fee:180,feeUnit:"hr",rating:4.9,reviewCount:201,bio:"Berlin underground, delivered to your speakers worldwide. I don't do playlists — I play live, I mix live, and your party will feel it.",events:["House Party","Rooftop"],available:["2025-06-28","2025-07-05","2025-07-19"],minHours:3,reviews:[{id:"rv8",author:"Zara F.",avatar:"Z",rating:5,date:"2025-05-15",eventType:"House Party",duration:"4 hours",text:"Flux did a 4-hour remote set for our house party. Real techno, real mixing, real energy — just piped through our sound system. My neighbours filed a complaint. Worth it.",helpful:52}],ratingBreakdown:{5:188,4:10,3:3,2:0,1:0}},
-  {id:6,name:"Mama Groove",avatar:"🌺",city:"Atlanta",genres:["Afrobeats","R&B","Pop","Hip-Hop"],fee:80,feeUnit:"hr",rating:4.6,reviewCount:58,bio:"Good vibes, live-mixed and delivered to your speakers. Afrobeats and R&B sets that make every generation dance. Book me, plug in, and enjoy.",events:["House Party","Birthday","Wedding"],available:["2025-06-15","2025-06-22","2025-06-29"],minHours:1,reviews:[{id:"rv9",author:"Keisha J.",avatar:"K",rating:5,date:"2025-05-12",eventType:"Birthday",duration:"2 hours",text:"Mama Groove did a surprise remote set for my mom's birthday. We had her phone plugged into a speaker, nobody knew it was live. My mom cried when she found out. So special.",helpful:28}],ratingBreakdown:{5:46,4:8,3:3,2:1,1:0}},
+  {id:1,name:"DJ Solaris",avatar:"☀️",city:"Miami",genres:["House","Techno","EDM"],fee:120,feeUnit:"hr",rating:4.9,reviewCount:87,bio:"10 years on the decks. Resident at Club Space Miami. I'll turn your living room into a deep house journey — all from my studio.",events:["House Party","Rooftop","Corporate"],available:["2026-06-06","2026-06-13","2026-06-20","2026-06-27"],minHours:1,reviews:[{id:"rv1",author:"Marcus T.",avatar:"M",rating:5,date:"2025-05-10",eventType:"House Party",duration:"3 hours",text:"Booked Solaris for my birthday. Streamed flawlessly through my Sonos. Guests had no idea the DJ wasn't in the room — until I told them. Incredible.",helpful:18},{id:"rv2",author:"Sofia R.",avatar:"S",rating:5,date:"2025-04-22",eventType:"Rooftop",text:"Remote set for our rooftop. He took song requests through the app, read the vibe perfectly. Zero technical issues.",helpful:11}],ratingBreakdown:{5:79,4:6,3:2,2:0,1:0}},
+  {id:2,name:"La Reina",avatar:"👑",city:"Los Angeles",genres:["Latin","Reggaeton","Afrobeats"],fee:95,feeUnit:"hr",rating:4.8,reviewCount:64,bio:"Bringing sabor to your speakers. I specialize in remote dinner sets and celebration vibes — Latin heat piped straight to your party.",events:["Dinner Party","Birthday","Wedding"],available:["2026-06-07","2026-06-14","2026-06-21","2026-06-28"],minHours:2,reviews:[{id:"rv3",author:"Elena V.",avatar:"E",rating:5,date:"2025-05-18",eventType:"Wedding",duration:"4 hours",text:"Hired La Reina remotely for our backyard wedding. My phone into a Bluetooth speaker and the whole reception danced all night. Best decision.",helpful:24},{id:"rv4",author:"Carlos M.",avatar:"C",rating:5,date:"2025-04-01",eventType:"Birthday",duration:"2 hours",text:"She warmed up slow with bachata then went full reggaeton. Crowd was wild. Remote DJ concept works SO well.",helpful:13}],ratingBreakdown:{5:57,4:5,3:2,2:0,1:0}},
+  {id:3,name:"Midnight Mack",avatar:"🎩",city:"New York",genres:["Hip-Hop","R&B","Funk"],fee:150,feeUnit:"hr",rating:5.0,reviewCount:112,bio:"Former tour DJ. Now I bring that arena energy straight to your house party — remotely. Plug me into your speakers and step back.",events:["House Party","Birthday","Bar Mitzvah"],available:["2026-06-05","2026-06-12","2026-06-19","2026-06-26"],minHours:2,reviews:[{id:"rv5",author:"Tasha W.",avatar:"T",rating:5,date:"2025-05-20",eventType:"Birthday",duration:"3 hours",text:"We streamed Mack through an airport Bluetooth speaker at a house party. 40 people. Nobody sat down for 3 hours. I'm still getting texts about it.",helpful:39},{id:"rv6",author:"Devon A.",avatar:"D",rating:5,date:"2025-05-01",eventType:"House Party",duration:"2 hours",text:"Remote DJ that actually felt personal. He sent a message before asking about the vibe. Mid-set he dropped a birthday shoutout. A+.",helpful:21}],ratingBreakdown:{5:112,4:0,3:0,2:0,1:0}},
+  {id:4,name:"Vesper Vox",avatar:"🌙",city:"Chicago",genres:["Jazz","Disco","Funk","House"],fee:85,feeUnit:"hr",rating:4.7,reviewCount:43,bio:"For dinners that deserve a soundtrack. I craft elegant sets — jazz to disco to deep house — piped privately to your table.",events:["Dinner Party","Anniversary","Corporate"],available:["2026-06-06","2026-06-13","2026-06-27","2026-07-04"],minHours:1,reviews:[{id:"rv7",author:"Olivia B.",avatar:"O",rating:5,date:"2025-05-05",eventType:"Dinner Party",duration:"2 hours",text:"Vesper streamed live to our dinner party. Guests kept asking who curated the playlist. When I said it was a live remote DJ they were floored.",helpful:10}],ratingBreakdown:{5:35,4:6,3:2,2:0,1:0}},
+  {id:5,name:"Flux",avatar:"⚡",city:"Berlin",genres:["Techno","EDM","House"],fee:180,feeUnit:"hr",rating:4.9,reviewCount:201,bio:"Berlin underground, delivered to your speakers worldwide. I don't do playlists — I play live, I mix live, and your party will feel it.",events:["House Party","Rooftop"],available:["2026-06-06","2026-06-20","2026-06-27","2026-07-11"],minHours:3,reviews:[{id:"rv8",author:"Zara F.",avatar:"Z",rating:5,date:"2025-05-15",eventType:"House Party",duration:"4 hours",text:"Flux did a 4-hour remote set for our house party. Real techno, real mixing, real energy — just piped through our sound system. My neighbours filed a complaint. Worth it.",helpful:52}],ratingBreakdown:{5:188,4:10,3:3,2:0,1:0}},
+  {id:6,name:"Mama Groove",avatar:"🌺",city:"Atlanta",genres:["Afrobeats","R&B","Pop","Hip-Hop"],fee:80,feeUnit:"hr",rating:4.6,reviewCount:58,bio:"Good vibes, live-mixed and delivered to your speakers. Afrobeats and R&B sets that make every generation dance. Book me, plug in, and enjoy.",events:["House Party","Birthday","Wedding"],available:["2026-06-07","2026-06-14","2026-06-21","2026-06-28"],minHours:1,reviews:[{id:"rv9",author:"Keisha J.",avatar:"K",rating:5,date:"2025-05-12",eventType:"Birthday",duration:"2 hours",text:"Mama Groove did a surprise remote set for my mom's birthday. We had her phone plugged into a speaker, nobody knew it was live. My mom cried when she found out. So special.",helpful:28}],ratingBreakdown:{5:46,4:8,3:3,2:1,1:0}},
 ];
 
 // ─── PRIMITIVES ───────────────────────────────────────────────────────────────
@@ -1980,11 +1980,9 @@ function AvailabilityCalendar({ availability, onToggleDate, onToggleSlot, onSele
             <div key={d}
               onClick={()=>{
                 if(past) return;
+                // In edit mode: single click marks available AND selects
+                if(!readOnly && onToggleDate && !avail) onToggleDate(ds);
                 setSelected(isSel ? null : ds);
-              }}
-              onDoubleClick={()=>{
-                if(past || readOnly) return;
-                if(onToggleDate) onToggleDate(ds);
               }}
               style={{
                 aspectRatio:"1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
@@ -2025,7 +2023,7 @@ function AvailabilityCalendar({ availability, onToggleDate, onToggleSlot, onSele
       </div>
 
       {/* Time slot editor — shows when a date is selected */}
-      {selected && !readOnly && availability?.dates?.includes(selected) && (
+      {selected && !readOnly && (
         <div style={{marginTop:16,background:"#0a1020",border:`1px solid ${C.border}`,borderRadius:10,padding:16}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
             <div style={{fontSize:11,letterSpacing:2,color:C.primary,textTransform:"uppercase"}}>
@@ -2107,10 +2105,10 @@ function DJDashboard({user,djs}) {
 
   // Availability state
   const [availability, setAvailability] = useState({
-    dates: ["2025-06-14","2025-06-21","2025-06-28","2025-07-05"],
+    dates: ["2026-06-06","2026-06-13","2026-06-20","2026-06-27"],
     slots: {
-      "2025-06-14": ["7:00 PM","8:00 PM","9:00 PM","10:00 PM"],
-      "2025-06-21": ["6:00 PM","7:00 PM","8:00 PM","9:00 PM","10:00 PM"],
+      "2026-06-06": ["7:00 PM","8:00 PM","9:00 PM","10:00 PM"],
+      "2026-06-13": ["6:00 PM","7:00 PM","8:00 PM","9:00 PM","10:00 PM"],
     },
     recurring: [],
   });
@@ -2224,7 +2222,9 @@ function DJDashboard({user,djs}) {
           {/* Calendar */}
           <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:20}}>
             <div style={{fontSize:11,letterSpacing:3,color:C.sub,textTransform:"uppercase",marginBottom:4}}>📅 Specific Date Availability</div>
-            <div style={{fontSize:12,color:C.sub,marginBottom:16}}>Click a date to select it → add time slots below · Use the button to mark/unmark availability</div>
+            <div style={{fontSize:12,color:C.sub,marginBottom:16}}>
+              Click any date to mark it available and set time slots · Click again to deselect · Use "✕ Remove" to unmark
+            </div>
             <AvailabilityCalendar
               availability={availability}
               onToggleDate={toggleDate}
@@ -2491,7 +2491,7 @@ export default function App() {
 
   const handleUserSignup=vals=>{setUser({...vals,name:vals.name||"Guest"});setRole("user");setPage("browse");};
   const handleDJSignup=vals=>{
-    const dj={id:genId(),name:vals.djName,avatar:"🎧",city:vals.city,genres:vals.genres||[],fee:parseInt(vals.fee)||100,feeUnit:"hr",rating:0,reviewCount:0,bio:vals.bio||"",events:vals.events||[],available:["2025-06-20","2025-06-27","2025-07-04"],minHours:parseInt(vals.minHours)||1,reviews:[],ratingBreakdown:{5:0,4:0,3:0,2:0,1:0}};
+    const dj={id:genId(),name:vals.djName,avatar:"🎧",city:vals.city,genres:vals.genres||[],fee:parseInt(vals.fee)||100,feeUnit:"hr",rating:0,reviewCount:0,bio:vals.bio||"",events:vals.events||[],available:["2026-06-13","2026-06-20","2026-06-27","2026-07-04"],minHours:parseInt(vals.minHours)||1,reviews:[],ratingBreakdown:{5:0,4:0,3:0,2:0,1:0}};
     setDjs(p=>[...p,dj]);
     setUser({...vals,djName:vals.djName});
     setRole("dj");
