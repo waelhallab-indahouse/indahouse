@@ -2349,8 +2349,15 @@ function DJDashboard({user,djs}) {
     },
     recurring: [],
   });
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("bookings");
   const [recurringDay, setRecurringDay] = useState(null);
+
+  // Incoming bookings state (in production these come from Supabase)
+  const [incomingBookings, setIncomingBookings] = useState([
+    {id:"b1", hostName:"Sarah M.", hostEmail:"sarah@email.com", event:"House Party", date:"2026-06-13", time:"8:00 PM", duration:"3 hours", fee:360, status:"pending", note:"Deep house please, 30 guests"},
+    {id:"b2", hostName:"James K.", hostEmail:"james@email.com", event:"Dinner Party", date:"2026-06-20", time:"7:00 PM", duration:"2 hours", fee:240, status:"pending", note:"Smooth jazz to start then transition to house"},
+    {id:"b3", hostName:"Lina A.", hostEmail:"lina@email.com", event:"Birthday", date:"2026-06-27", time:"9:00 PM", duration:"4 hours", fee:480, status:"confirmed", note:"Birthday girl loves Afrobeats"},
+  ]);
 
   const toggleDate = (dateStr) => {
     setAvailability(prev => ({
@@ -2389,7 +2396,7 @@ function DJDashboard({user,djs}) {
 
       {/* Tab nav */}
       <div style={{display:"flex",gap:3,marginBottom:24,borderBottom:`1px solid ${C.border}`,paddingBottom:0}}>
-        {[["overview","📊 Overview"],["calendar","📅 Availability"],["profile","👤 Profile"]].map(([id,label])=>(
+        {[["bookings","📥 Bookings"],["overview","📊 Overview"],["calendar","📅 Availability"],["profile","👤 Profile"]].map(([id,label])=>(
           <button key={id} onClick={()=>setActiveTab(id)} style={{
             background:"none",border:"none",
             borderBottom:activeTab===id?`2px solid ${C.primary}`:"2px solid transparent",
@@ -2399,6 +2406,145 @@ function DJDashboard({user,djs}) {
           }}>{label}</button>
         ))}
       </div>
+
+      {/* Bookings tab */}
+      {activeTab==="bookings" && (
+        <div>
+          {/* Stats row */}
+          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:20}}>
+            {[
+              ["📥","Pending",incomingBookings.filter(b=>b.status==="pending").length],
+              ["✅","Confirmed",incomingBookings.filter(b=>b.status==="confirmed").length],
+              ["💰","Revenue",`$${incomingBookings.filter(b=>b.status==="confirmed").reduce((s,b)=>s+b.fee,0)}`],
+            ].map(([ic,label,val])=>(
+              <div key={label} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:"14px 16px",textAlign:"center"}}>
+                <div style={{fontSize:22,marginBottom:4}}>{ic}</div>
+                <div style={{fontFamily:"'Impact','Arial Black',sans-serif",fontSize:22,color:C.primary}}>{val}</div>
+                <div style={{fontSize:10,color:C.sub,letterSpacing:2,textTransform:"uppercase",marginTop:2}}>{label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Pending bookings */}
+          {incomingBookings.filter(b=>b.status==="pending").length > 0 && (
+            <div style={{marginBottom:20}}>
+              <div style={{fontSize:11,letterSpacing:3,color:C.yellow,textTransform:"uppercase",marginBottom:12,fontWeight:800}}>
+                ⏳ Pending — Action Required
+              </div>
+              {incomingBookings.filter(b=>b.status==="pending").map(booking=>(
+                <div key={booking.id} style={{
+                  background:C.card, border:`2px solid ${C.yellow}44`,
+                  borderRadius:12, padding:18, marginBottom:12,
+                }}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:10}}>
+                    <div>
+                      <div style={{fontWeight:800,fontSize:15,marginBottom:4}}>{booking.hostName}</div>
+                      <div style={{display:"flex",gap:12,flexWrap:"wrap",fontSize:12,color:C.sub,marginBottom:8}}>
+                        <span>📅 {booking.date}</span>
+                        <span>🕐 {booking.time}</span>
+                        <span>⏱ {booking.duration}</span>
+                        <span>🎉 {booking.event}</span>
+                      </div>
+                      {booking.note && (
+                        <div style={{fontSize:12,color:C.sub,background:"#0a1020",borderRadius:6,padding:"6px 10px",marginBottom:8,fontStyle:"italic"}}>
+                          "{booking.note}"
+                        </div>
+                      )}
+                      <div style={{fontSize:16,fontWeight:800,color:C.green}}>${booking.fee}</div>
+                    </div>
+                    <div style={{display:"flex",gap:8,flexShrink:0}}>
+                      <button
+                        onClick={()=>{
+                          setIncomingBookings(prev=>prev.map(b=>b.id===booking.id?{...b,status:"declined"}:b));
+                        }}
+                        style={{background:`${C.red}18`,color:C.red,border:`1px solid ${C.red}44`,
+                          padding:"10px 18px",borderRadius:8,cursor:"pointer",fontSize:12,
+                          fontWeight:800,fontFamily:"inherit",transition:"all 0.15s"}}>
+                        ✕ Decline
+                      </button>
+                      <button
+                        onClick={()=>{
+                          setIncomingBookings(prev=>prev.map(b=>b.id===booking.id?{...b,status:"confirmed"}:b));
+                          // Trigger email + notification (demo)
+                          alert(`✅ Booking confirmed!
+
+In production, an email will be sent to ${booking.hostEmail} via Resend.
+
+Email: "Your DJ confirmed your ${booking.event} on ${booking.date} at ${booking.time}!"`);
+                        }}
+                        style={{background:C.green,color:"#000",border:"none",
+                          padding:"10px 18px",borderRadius:8,cursor:"pointer",fontSize:12,
+                          fontWeight:800,fontFamily:"inherit",transition:"all 0.15s"}}>
+                        ✓ Confirm
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Confirmed bookings */}
+          {incomingBookings.filter(b=>b.status==="confirmed").length > 0 && (
+            <div style={{marginBottom:20}}>
+              <div style={{fontSize:11,letterSpacing:3,color:C.green,textTransform:"uppercase",marginBottom:12,fontWeight:800}}>
+                ✅ Confirmed Sessions
+              </div>
+              {incomingBookings.filter(b=>b.status==="confirmed").map(booking=>(
+                <div key={booking.id} style={{
+                  background:C.card, border:`1px solid ${C.green}33`,
+                  borderRadius:12, padding:18, marginBottom:10,
+                  display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10,
+                }}>
+                  <div>
+                    <div style={{fontWeight:800,fontSize:14,marginBottom:4,color:C.green}}>✓ {booking.hostName}</div>
+                    <div style={{display:"flex",gap:12,flexWrap:"wrap",fontSize:12,color:C.sub}}>
+                      <span>📅 {booking.date}</span>
+                      <span>🕐 {booking.time}</span>
+                      <span>⏱ {booking.duration}</span>
+                      <span>🎉 {booking.event}</span>
+                    </div>
+                  </div>
+                  <div style={{fontWeight:800,fontSize:16,color:C.green}}>${booking.fee}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Declined bookings */}
+          {incomingBookings.filter(b=>b.status==="declined").length > 0 && (
+            <div>
+              <div style={{fontSize:11,letterSpacing:3,color:C.sub,textTransform:"uppercase",marginBottom:12,fontWeight:800}}>
+                ✕ Declined
+              </div>
+              {incomingBookings.filter(b=>b.status==="declined").map(booking=>(
+                <div key={booking.id} style={{
+                  background:"#0a0f1a", border:`1px solid ${C.border}`,
+                  borderRadius:12, padding:16, marginBottom:8, opacity:0.6,
+                  display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10,
+                }}>
+                  <div>
+                    <div style={{fontWeight:800,fontSize:14,marginBottom:4,textDecoration:"line-through",color:C.sub}}>{booking.hostName}</div>
+                    <div style={{fontSize:12,color:C.sub}}>{booking.date} · {booking.event}</div>
+                  </div>
+                  <button onClick={()=>setIncomingBookings(prev=>prev.map(b=>b.id===booking.id?{...b,status:"pending"}:b))}
+                    style={{background:"none",border:`1px solid ${C.border}`,color:C.sub,padding:"6px 12px",borderRadius:6,cursor:"pointer",fontSize:11,fontFamily:"inherit"}}>
+                    Undo
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {incomingBookings.length === 0 && (
+            <div style={{textAlign:"center",padding:"48px 20px",color:C.sub}}>
+              <div style={{fontSize:48,marginBottom:12}}>📭</div>
+              <div style={{fontSize:16,fontWeight:800,marginBottom:8}}>No bookings yet</div>
+              <div style={{fontSize:13}}>Complete your profile and availability calendar to start getting booked</div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Overview tab */}
       {activeTab==="overview" && (
