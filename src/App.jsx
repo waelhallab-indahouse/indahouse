@@ -2856,6 +2856,87 @@ function MessageThread({threadId, user, dj, onClose}) {
   );
 }
 
+// ─── PWA INSTALL PROMPT ──────────────────────────────────────────────────────
+function PWAInstallPrompt() {
+  const [prompt, setPrompt] = useState(null);
+  const [showBanner, setShowBanner] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    // Check if already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) return;
+    if (window.navigator.standalone) return; // iOS standalone
+
+    // iOS detection
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const notInStandalone = !window.navigator.standalone;
+    if (ios && notInStandalone) {
+      setIsIOS(true);
+      setTimeout(() => setShowBanner(true), 3000);
+      return;
+    }
+
+    // Android/Desktop: capture beforeinstallprompt
+    const handler = (e) => {
+      e.preventDefault();
+      setPrompt(e);
+      setTimeout(() => setShowBanner(true), 3000);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const install = async () => {
+    if (prompt) {
+      prompt.prompt();
+      const result = await prompt.userChoice;
+      if (result.outcome === 'accepted') setShowBanner(false);
+    }
+  };
+
+  if (!showBanner || dismissed) return null;
+
+  return (
+    <div style={{
+      position:"fixed", bottom:16, left:16, right:16, zIndex:600,
+      background:"linear-gradient(135deg, #0e1a30, #060d1a)",
+      border:`1px solid ${C.primary}`,
+      borderRadius:16, padding:"16px 18px",
+      boxShadow:`0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px ${C.primary}22`,
+      display:"flex", gap:14, alignItems:"center",
+      animation:"slideIn 0.4s ease",
+    }}>
+      <div style={{fontSize:36, flexShrink:0}}>🎧</div>
+      <div style={{flex:1}}>
+        <div style={{fontFamily:"'Impact','Arial Black',sans-serif", fontSize:15, color:C.primary, letterSpacing:0.5, marginBottom:3}}>
+          Add to Home Screen
+        </div>
+        <div style={{fontSize:12, color:C.sub, lineHeight:1.5}}>
+          {isIOS
+            ? "Tap the Share button below, then "Add to Home Screen" for the best experience"
+            : "Install Indahouse as an app for quick access and offline support"}
+        </div>
+      </div>
+      <div style={{display:"flex", flexDirection:"column", gap:6, flexShrink:0}}>
+        {!isIOS && (
+          <button onClick={install} style={{
+            background:C.primary, color:"#000", border:"none",
+            borderRadius:8, padding:"8px 14px", cursor:"pointer",
+            fontSize:12, fontWeight:800, fontFamily:"inherit",
+            whiteSpace:"nowrap",
+          }}>Install ↓</button>
+        )}
+        <button onClick={()=>setDismissed(true)} style={{
+          background:"transparent", color:C.sub, border:`1px solid ${C.border}`,
+          borderRadius:8, padding:"6px 14px", cursor:"pointer",
+          fontSize:11, fontFamily:"inherit",
+        }}>Not now</button>
+      </div>
+    </div>
+  );
+}
+
 // ─── APP ROOT ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [page,setPage]=useState("landing");
@@ -3061,6 +3142,7 @@ export default function App() {
       {bookingTarget&&<BookingModal dj={bookingTarget} onClose={()=>setBookingTarget(null)} onConfirm={b=>{handleConfirm(b);setBookingTarget(null);setPage("user-dash");}}/>}
       {messageTarget&&<MessageThread threadId={messageTarget.dj.id} user={user} dj={messageTarget.dj} onClose={()=>setMessageTarget(null)}/>}
       {reviewTarget&&<WriteReview dj={reviewTarget.dj} user={user} booking={reviewTarget.booking} onClose={()=>setReviewTarget(null)} onSubmit={r=>{handleSubmitReview(reviewTarget.dj.id,r);setReviewTarget(null);}}/>}
+      <PWAInstallPrompt/>
       {/* Notification toast */}
       <Toast notifications={toasts} onDismiss={id=>setToasts(p=>p.filter(t=>t.id!==id))}/>
       {/* Notification panel */}
