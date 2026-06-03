@@ -354,6 +354,7 @@ function BookingModal({dj,onClose,onConfirm}) {
   const hours = duration ? parseFloat(duration) : 0;
   const totalFee = hours ? Math.round(dj.fee * hours) : dj.fee;
   const ok = date && eventType && duration && startTime;
+  // startTime gets set when host picks a slot or types a time
 
   if(step===2) return (
     <div style={OVR}><div style={MOD}>
@@ -424,8 +425,11 @@ function BookingModal({dj,onClose,onConfirm}) {
               ✓ Selected: {date} at {startTime}
             </div>
           )}
-          {(!date || !startTime) && (
-            <div style={{marginTop:10,fontSize:11,color:C.sub}}>Click a green date, then select a time slot below it</div>
+          {!date && (
+            <div style={{marginTop:10,fontSize:11,color:C.sub}}>👆 Click a green date to select it</div>
+          )}
+          {date && !startTime && (
+            <div style={{marginTop:10,fontSize:11,color:"#FF9944"}}>⚠️ Please select or enter a time slot above</div>
           )}
         </div>
       </div>
@@ -2309,7 +2313,21 @@ function AvailabilityCalendar({ availability, onToggleDate, onToggleSlot, onSele
               })}
             </div>
           ) : (
-            <div style={{fontSize:12,color:C.sub}}>All day available — contact DJ for preferred time</div>
+            <div>
+              <div style={{fontSize:12,color:C.sub,marginBottom:10}}>No specific slots set — pick your preferred time:</div>
+              <input
+                type="time"
+                onChange={e=>{
+                  if(onSelectSlot) onSelectSlot(selected, e.target.value ?
+                    new Date('1970-01-01T'+e.target.value).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})
+                    : "");
+                }}
+                style={{background:"#0a1020",border:`1px solid ${C.border}`,borderRadius:6,
+                  padding:"8px 12px",color:C.text,fontFamily:"inherit",fontSize:13,
+                  outline:"none",width:"100%",
+                }}
+              />
+            </div>
           )}
         </div>
       )}
