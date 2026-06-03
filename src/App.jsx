@@ -1853,6 +1853,225 @@ function LiveSession({booking, onEnd}) {
     </div>
   );
 }
+// ─── NOTIFICATION SYSTEM ─────────────────────────────────────────────────────
+
+// In-app toast notification
+function Toast({notifications, onDismiss}) {
+  return (
+    <div style={{
+      position:"fixed", top:70, right:16, zIndex:500,
+      display:"flex", flexDirection:"column", gap:10,
+      maxWidth:360, width:"100%",
+    }}>
+      {notifications.map(n=>(
+        <div key={n.id} style={{
+          background: n.type==="success" ? "#0C1F0E" :
+                      n.type==="live"    ? "#1A0808" :
+                      n.type==="info"    ? "#0A1020" : "#1A1008",
+          border:`1px solid ${
+            n.type==="success" ? C.green :
+            n.type==="live"    ? C.red :
+            n.type==="info"    ? C.primary : C.accent}`,
+          borderRadius:12,
+          padding:"14px 16px",
+          boxShadow:"0 8px 32px rgba(0,0,0,0.4)",
+          animation:"slideIn 0.3s ease",
+          display:"flex", gap:12, alignItems:"flex-start",
+        }}>
+          <div style={{fontSize:22, flexShrink:0}}>{n.icon}</div>
+          <div style={{flex:1}}>
+            <div style={{fontWeight:800, fontSize:13, marginBottom:3,
+              color: n.type==="success" ? C.green :
+                     n.type==="live"    ? C.red :
+                     n.type==="info"    ? C.primary : C.accent
+            }}>{n.title}</div>
+            <div style={{fontSize:12, color:C.sub, lineHeight:1.6}}>{n.message}</div>
+            {n.action && (
+              <button onClick={n.action.fn} style={{
+                marginTop:8, background:C.primary, color:"#000",
+                border:"none", borderRadius:6, padding:"5px 12px",
+                fontSize:11, fontWeight:800, cursor:"pointer", fontFamily:"inherit",
+              }}>{n.action.label}</button>
+            )}
+          </div>
+          <button onClick={()=>onDismiss(n.id)} style={{
+            background:"none", border:"none", color:C.sub,
+            cursor:"pointer", fontSize:16, lineHeight:1, flexShrink:0,
+          }}>×</button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Notification bell icon with badge
+function NotificationBell({notifications, onOpen}) {
+  const unread = notifications.filter(n=>!n.read).length;
+  return (
+    <div onClick={onOpen} style={{position:"relative", cursor:"pointer", padding:"4px 8px"}}>
+      <div style={{fontSize:20}}>🔔</div>
+      {unread > 0 && (
+        <div style={{
+          position:"absolute", top:0, right:2,
+          width:16, height:16, borderRadius:"50%",
+          background:C.red, color:"#fff",
+          fontSize:9, fontWeight:900,
+          display:"flex", alignItems:"center", justifyContent:"center",
+          boxShadow:`0 0 6px ${C.red}`,
+          animation:"pulse 1s infinite",
+        }}>{unread > 9 ? "9+" : unread}</div>
+      )}
+    </div>
+  );
+}
+
+// Notification panel (slide-in from right)
+function NotificationPanel({notifications, onClose, onMarkRead, onClearAll}) {
+  return (
+    <div style={{position:"fixed", inset:0, zIndex:400}} onClick={onClose}>
+      <div onClick={e=>e.stopPropagation()} style={{
+        position:"absolute", top:0, right:0, bottom:0,
+        width:"min(380px,100vw)",
+        background:C.card,
+        borderLeft:`1px solid ${C.border}`,
+        display:"flex", flexDirection:"column",
+        boxShadow:"-8px 0 40px rgba(0,0,0,0.5)",
+        animation:"slideInRight 0.3s ease",
+      }}>
+        {/* Header */}
+        <div style={{
+          padding:"18px 18px 14px",
+          borderBottom:`1px solid ${C.border}`,
+          display:"flex", justifyContent:"space-between", alignItems:"center",
+          background:"#0A1020",
+        }}>
+          <div>
+            <div style={{fontFamily:"'Impact','Arial Black',sans-serif", fontSize:18, color:C.primary, letterSpacing:1}}>NOTIFICATIONS</div>
+            <div style={{fontSize:11, color:C.sub, marginTop:2}}>
+              {notifications.filter(n=>!n.read).length} unread
+            </div>
+          </div>
+          <div style={{display:"flex", gap:8, alignItems:"center"}}>
+            <button onClick={onMarkRead} style={{background:"none", border:"none", color:C.sub, cursor:"pointer", fontSize:11, fontFamily:"inherit"}}>
+              Mark all read
+            </button>
+            <button onClick={onClearAll} style={{background:"none", border:"none", color:C.sub, cursor:"pointer", fontSize:11, fontFamily:"inherit"}}>
+              Clear all
+            </button>
+            <button onClick={onClose} style={{background:C.muted, border:"none", color:C.sub, width:28, height:28, borderRadius:"50%", cursor:"pointer", fontSize:14}}>×</button>
+          </div>
+        </div>
+
+        {/* Notification list */}
+        <div style={{flex:1, overflowY:"auto"}}>
+          {notifications.length === 0 ? (
+            <div style={{padding:48, textAlign:"center", color:C.sub}}>
+              <div style={{fontSize:40, marginBottom:12}}>🔔</div>
+              <div style={{fontSize:14}}>No notifications yet</div>
+              <div style={{fontSize:12, marginTop:6, color:C.sub2}}>We'll notify you when your DJ confirms</div>
+            </div>
+          ) : (
+            notifications.map(n=>(
+              <div key={n.id} style={{
+                padding:"16px 18px",
+                borderBottom:`1px solid ${C.border}`,
+                background: n.read ? "transparent" : `${C.primary}08`,
+                transition:"background 0.2s",
+              }}>
+                <div style={{display:"flex", gap:12, alignItems:"flex-start"}}>
+                  <div style={{
+                    width:40, height:40, borderRadius:"50%", flexShrink:0,
+                    background: n.type==="success" ? `${C.green}20` :
+                                n.type==="live"    ? `${C.red}20` :
+                                n.type==="info"    ? `${C.primary}20` : `${C.accent}20`,
+                    display:"flex", alignItems:"center", justifyContent:"center",
+                    fontSize:18,
+                  }}>{n.icon}</div>
+                  <div style={{flex:1}}>
+                    <div style={{fontWeight:800, fontSize:13, marginBottom:3,
+                      color: n.read ? C.text : C.primary
+                    }}>{n.title}</div>
+                    <div style={{fontSize:12, color:C.sub, lineHeight:1.6, marginBottom:6}}>{n.message}</div>
+                    <div style={{fontSize:10, color:C.sub2}}>{n.time}</div>
+                    {!n.read && (
+                      <div style={{width:6, height:6, borderRadius:"50%", background:C.primary, position:"absolute", right:18, top:"50%", transform:"translateY(-50%)"}}/>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Push notification opt-in */}
+        <div style={{padding:"14px 18px", borderTop:`1px solid ${C.border}`, background:"#0A1020"}}>
+          <PushNotificationToggle/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Push notification permission toggle
+function PushNotificationToggle() {
+  const [status, setStatus] = useState(
+    typeof Notification !== "undefined" ? Notification.permission : "unsupported"
+  );
+
+  const requestPermission = async () => {
+    if (typeof Notification === "undefined") return;
+    const result = await Notification.requestPermission();
+    setStatus(result);
+    if (result === "granted") {
+      // Show a test notification
+      new Notification("Indahouse 🎧", {
+        body: "Push notifications enabled! You'll be notified when your DJ confirms.",
+        icon: "/favicon.ico",
+      });
+    }
+  };
+
+  if (status === "granted") return (
+    <div style={{display:"flex", alignItems:"center", gap:10, fontSize:12}}>
+      <div style={{width:8, height:8, borderRadius:"50%", background:C.green}}/>
+      <span style={{color:C.green, fontWeight:700}}>Push notifications ON</span>
+      <span style={{color:C.sub, fontSize:11}}>You'll be notified on this device</span>
+    </div>
+  );
+
+  if (status === "denied") return (
+    <div style={{fontSize:11, color:C.sub, lineHeight:1.6}}>
+      🔕 Push notifications blocked. Enable them in your browser settings to get notified when your DJ goes live.
+    </div>
+  );
+
+  return (
+    <div>
+      <div style={{fontSize:11, color:C.sub, marginBottom:8, lineHeight:1.6}}>
+        Enable push notifications to get alerted when your DJ confirms or goes live — even when the app is closed.
+      </div>
+      <Btn onClick={requestPermission} sm full variant="outline">
+        🔔 Enable Push Notifications
+      </Btn>
+    </div>
+  );
+}
+
+// Hook to send a push notification
+function usePushNotification() {
+  const send = (title, body, icon="🎧") => {
+    if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+      new Notification(`${icon} ${title}`, {
+        body,
+        icon: "/favicon.ico",
+        badge: "/favicon.ico",
+        vibrate: [200, 100, 200],
+      });
+    }
+  };
+  return send;
+}
+
 // ─── USER DASHBOARD ───────────────────────────────────────────────────────────
 function UserDashboard({user,bookings,onJoinSession,onReview,onMessage}) {
   const now=new Date();
@@ -2486,8 +2705,22 @@ export default function App() {
   const [reviewTarget,setReviewTarget]=useState(null);
   const [activeSession,setActiveSession]=useState(null);
   const [messageTarget,setMessageTarget]=useState(null); // {dj}
+  const [notifications,setNotifications]=useState([
+    {id:"n1",type:"info",icon:"🎧",title:"Welcome to Indahouse!",message:"Browse DJs and book your first private session. Your DJ streams live directly to your speakers.",time:"Just now",read:false},
+  ]);
+  const [showNotifPanel,setShowNotifPanel]=useState(false);
+  const [toasts,setToasts]=useState([]);
 
-  const nav=p=>{setPage(p);setProfileDJ(null);setActiveSession(null);};
+  const nav=p=>{setPage(p);setProfileDJ(null);setActiveSession(null);setShowNotifPanel(false);};
+
+  const sendNotif = (notification) => {
+    const n = {id:genId(), time:"Just now", read:false, ...notification};
+    setNotifications(prev=>[n,...prev]);
+    setToasts(prev=>[n,...prev].slice(0,3));
+    setTimeout(()=>setToasts(prev=>prev.filter(t=>t.id!==n.id)), 5000);
+  };
+
+  const sendPush = usePushNotification();
 
   const handleUserSignup=vals=>{setUser({...vals,name:vals.name||"Guest"});setRole("user");setPage("browse");};
   const handleDJSignup=vals=>{
@@ -2498,7 +2731,23 @@ export default function App() {
     setPage("dj-dash");
   };
   const handleBook=dj=>{if(!user){setPage("signup-user");return;}setBookingTarget(dj);};
-  const handleConfirm=b=>{setBookings(p=>[...p,{...b,status:"confirmed"}]);};
+  const handleConfirm=b=>{
+    setBookings(p=>[...p,{...b,status:"confirmed"}]);
+    // Simulate DJ confirming after 3 seconds
+    setTimeout(()=>{
+      const notif={type:"success",icon:"✅",title:"Booking Confirmed!",
+        message:`${b.dj.name} confirmed your session on ${b.date} at ${b.startTime}. Get your speakers ready! 🔊`};
+      sendNotif(notif);
+      sendPush("Booking Confirmed!",`${b.dj.name} confirmed your ${b.duration} session on ${b.date}`,"✅");
+      // DJ goes live — in-app notification only (no email)
+      setTimeout(()=>{
+        const liveNotif={type:"live",icon:"🔴",title:"Your DJ is Live!",
+          message:`${b.dj.name} is now streaming live. Open My Sessions and hit Play! 🎧`,
+          action:{label:"▶ Join Session",fn:()=>{setActiveSession(b);setPage("session");}}};
+        sendNotif(liveNotif); // in-app toast + notification panel only
+      },8000);
+    },3000);
+  };
   const handleSubmitReview=(djId,review)=>{
     setReviewOverrides(prev=>({...prev,[djId]:[review,...(prev[djId]||[])]}));
     setDjs(prev=>prev.map(dj=>{if(dj.id!==djId) return dj;const all=[review,...dj.reviews];const avg=all.reduce((s,r)=>s+r.rating,0)/all.length;const nb={...dj.ratingBreakdown};nb[review.rating]=(nb[review.rating]||0)+1;return {...dj,rating:Math.round(avg*10)/10,reviewCount:dj.reviewCount+1,ratingBreakdown:nb};}));
@@ -2618,6 +2867,7 @@ export default function App() {
                 fontWeight:800,fontFamily:"inherit",textTransform:"uppercase",letterSpacing:1
               }}>{label}</button>
             ))}
+            {user&&<NotificationBell notifications={notifications} onOpen={()=>setShowNotifPanel(p=>!p)}/>}
             {user&&<button onClick={()=>{setUser(null);setRole(null);nav("landing");}} style={{background:"transparent",color:C.sub,border:`1px solid ${C.border}`,padding:"5px 11px",borderRadius:6,cursor:"pointer",fontSize:11,fontFamily:"inherit",textTransform:"uppercase",letterSpacing:1}}>Log Out</button>}
           </div>
         </div>
@@ -2647,6 +2897,15 @@ export default function App() {
       {bookingTarget&&<BookingModal dj={bookingTarget} onClose={()=>setBookingTarget(null)} onConfirm={b=>{handleConfirm(b);setBookingTarget(null);setPage("user-dash");}}/>}
       {messageTarget&&<MessageThread threadId={messageTarget.dj.id} user={user} dj={messageTarget.dj} onClose={()=>setMessageTarget(null)}/>}
       {reviewTarget&&<WriteReview dj={reviewTarget.dj} user={user} booking={reviewTarget.booking} onClose={()=>setReviewTarget(null)} onSubmit={r=>{handleSubmitReview(reviewTarget.dj.id,r);setReviewTarget(null);}}/>}
+      {/* Notification toast */}
+      <Toast notifications={toasts} onDismiss={id=>setToasts(p=>p.filter(t=>t.id!==id))}/>
+      {/* Notification panel */}
+      {showNotifPanel&&<NotificationPanel
+        notifications={notifications}
+        onClose={()=>setShowNotifPanel(false)}
+        onMarkRead={()=>setNotifications(p=>p.map(n=>({...n,read:true})))}
+        onClearAll={()=>{setNotifications([]);setShowNotifPanel(false);}}
+      />}
     </div>
   );
 }
