@@ -2340,7 +2340,7 @@ function AvailabilityCalendar({ availability, onToggleDate, onToggleSlot, onSele
 }
 
 // ─── DJ DASHBOARD ─────────────────────────────────────────────────────────────
-function DJDashboard({user,djs}) {
+function DJDashboard({user,djs,onGoLive}) {
   const myDJ=djs.find(d=>d.name===user.djName)||{reviews:[],reviewCount:0,rating:0,ratingBreakdown:{}};
   const totalEarnings=myDJ.reviewCount*((user.fee||100)*2.5);
 
@@ -2500,16 +2500,46 @@ Email: "Your DJ confirmed your ${booking.event} on ${booking.date} at ${booking.
                   borderRadius:12, padding:18, marginBottom:10,
                   display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10,
                 }}>
-                  <div>
+                  <div style={{flex:1}}>
                     <div style={{fontWeight:800,fontSize:14,marginBottom:4,color:C.green}}>✓ {booking.hostName}</div>
-                    <div style={{display:"flex",gap:12,flexWrap:"wrap",fontSize:12,color:C.sub}}>
+                    <div style={{display:"flex",gap:12,flexWrap:"wrap",fontSize:12,color:C.sub,marginBottom:8}}>
                       <span>📅 {booking.date}</span>
                       <span>🕐 {booking.time}</span>
                       <span>⏱ {booking.duration}</span>
                       <span>🎉 {booking.event}</span>
                     </div>
+                    <div style={{fontSize:11,color:C.sub}}>Host: {booking.hostEmail}</div>
                   </div>
-                  <div style={{fontWeight:800,fontSize:16,color:C.green}}>${booking.fee}</div>
+                  <div style={{display:"flex",flexDirection:"column",gap:8,alignItems:"flex-end",flexShrink:0}}>
+                    <div style={{fontWeight:800,fontSize:16,color:C.green}}>${booking.fee}</div>
+                    <button
+                      onClick={()=>{
+                        // Create a booking object that LiveSession expects
+                        const sessionBooking = {
+                          id: booking.id,
+                          isDJ: true,
+                          dj: {name: user.djName || user.name, avatar:"🎧", id: user.id},
+                          hostName: booking.hostName,
+                          date: booking.date,
+                          startTime: booking.time,
+                          duration: booking.duration,
+                          eventType: booking.event,
+                          fee: booking.fee,
+                        };
+                        onGoLive(sessionBooking);
+                      }}
+                      style={{
+                        background:C.red, color:"#fff",
+                        border:"none", borderRadius:8,
+                        padding:"10px 18px", cursor:"pointer",
+                        fontSize:12, fontWeight:800, fontFamily:"inherit",
+                        display:"flex", alignItems:"center", gap:6,
+                        boxShadow:`0 0 12px ${C.red}44`,
+                        animation:"pulse 2s infinite",
+                      }}>
+                      🔴 Go Live
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -3132,7 +3162,7 @@ export default function App() {
         {currentPage==="browse"&&<Browse djs={djs} onBook={handleBook} onProfile={dj=>setProfileDJ(dj)} onMessage={dj=>setMessageTarget({dj})} user={user}/>}
         {currentPage==="profile"&&profileDJ&&<DJProfile dj={profileDJ} user={user} onBook={handleBook} onMessage={dj=>setMessageTarget({dj})} onReview={(dj)=>setReviewTarget({dj,booking:null})} onBack={()=>setProfileDJ(null)} onHelpful={handleHelpful} reviewOverrides={reviewOverrides}/>}
         {currentPage==="user-dash"&&user&&<UserDashboard user={user} bookings={bookings} onJoinSession={b=>setActiveSession(b)} onReview={(dj,b)=>setReviewTarget({dj,booking:b})} onMessage={dj=>setMessageTarget({dj})}/>}
-        {currentPage==="dj-dash"&&user&&<DJDashboard user={user} djs={djs}/>}
+        {currentPage==="dj-dash"&&user&&<DJDashboard user={user} djs={djs} onGoLive={b=>{setActiveSession(b);setPage("session");}}/>}
       </div>
       {bookingTarget&&<BookingModal dj={bookingTarget} onClose={()=>setBookingTarget(null)} onConfirm={b=>{handleConfirm(b);setBookingTarget(null);setPage("user-dash");}}/>}
       {messageTarget&&<MessageThread threadId={messageTarget.dj.id} user={user} dj={messageTarget.dj} onClose={()=>setMessageTarget(null)}/>}
