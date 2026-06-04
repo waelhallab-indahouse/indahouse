@@ -1562,7 +1562,8 @@ function LiveSession({booking, onEnd}) {
 
   // ── LIVE — FULLSCREEN DEEP HOUSE DJ VIEW ──────────────────────────────────
   return (
-    <div style={{position:"fixed",inset:0,background:"#030810",color:C.text,overflow:"hidden",fontFamily:"inherit"}}>
+    <div style={{position:"fixed",inset:0,background:"#030810",color:C.text,overflow:"hidden",fontFamily:"inherit",
+      paddingTop:"env(safe-area-inset-top)",paddingBottom:"env(safe-area-inset-bottom)"}}>
 
       {/* ── Ambient background ── */}
       <div style={{position:"absolute",inset:0,zIndex:0,pointerEvents:"none"}}>
@@ -1676,9 +1677,12 @@ function LiveSession({booking, onEnd}) {
       </div>
 
       {/* ── TOP HUD ── */}
-      <div style={{position:"absolute",top:0,left:0,right:0,zIndex:10,padding:"14px 18px",
+      <div style={{position:"absolute",top:0,left:0,right:0,zIndex:10,
+        paddingTop:"calc(env(safe-area-inset-top) + 14px)",
+        padding:"14px 18px",
+        paddingTop:"calc(env(safe-area-inset-top) + 14px)",
         display:"flex",alignItems:"center",gap:10,flexWrap:"wrap",
-        background:"linear-gradient(to bottom,rgba(3,8,16,0.9),transparent)"}}>
+        background:"linear-gradient(to bottom,rgba(3,8,16,0.95),transparent)"}}>
 
         {/* LIVE badge */}
         <div style={{display:"flex",alignItems:"center",gap:7,
@@ -1717,7 +1721,7 @@ function LiveSession({booking, onEnd}) {
       </div>
 
       {/* ── NOW PLAYING pill — centered ── */}
-      <div style={{position:"absolute",top:66,left:"50%",transform:"translateX(-50%)",zIndex:10,whiteSpace:"nowrap"}}>
+      <div style={{position:"absolute",top:"calc(env(safe-area-inset-top) + 66px)",left:"50%",transform:"translateX(-50%)",zIndex:10,whiteSpace:"nowrap"}}>
         <div style={{background:"rgba(0,0,0,0.7)",backdropFilter:"blur(14px)",
           border:`1px solid ${C.primary}44`,borderRadius:24,padding:"6px 18px",
           display:"flex",alignItems:"center",gap:10}}>
@@ -3083,15 +3087,6 @@ export default function App() {
   if(currentPage==="session") return (
     <div style={{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"'Helvetica Neue',Helvetica,Arial,sans-serif"}}>
       <style>{styles}</style>
-      <nav style={{position:"sticky",top:0,zIndex:100,background:"#070D1Cf0",backdropFilter:"blur(12px)",borderBottom:`1px solid ${C.border}`,paddingTop:"env(safe-area-inset-top)"}}>
-        <div style={{maxWidth:1100,margin:"0 auto",padding:"0 16px",display:"flex",justifyContent:"space-between",alignItems:"center",height:52}}>
-          <Logo sm/>
-          <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <div style={{width:8,height:8,borderRadius:"50%",background:C.red,animation:"pulse 1s infinite"}}/>
-            <span style={{fontSize:11,color:C.red,fontWeight:800,letterSpacing:2}}>LIVE — PRIVATE SESSION</span>
-          </div>
-        </div>
-      </nav>
       <LiveSession booking={activeSession} onEnd={()=>{setActiveSession(null);setPage("user-dash");}}/>
     </div>
   );
